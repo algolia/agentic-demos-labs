@@ -1,0 +1,487 @@
+/* Google Fonts must be imported first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+/* ------------------------------------------------ */
+/* Satoshi Font Family (WOFF2)                      */
+/* ------------------------------------------------ */
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-LightItalic.woff2') format('woff2');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-MediumItalic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-BlackItalic.woff2') format('woff2');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Static theme values (fonts, primitive radius) */
+@theme {
+  --font-satoshi: 'Satoshi', system-ui, sans-serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+  /* Primitive radius tokens */
+  --radius-none: 0rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* Dynamic theme values - resolved at runtime via CSS variables */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  /* Semantic radius tokens - enable rounded-card, rounded-button, etc. */
+  --radius-card: var(--radius-card-base);
+  --radius-button: var(--radius-button-base);
+  --radius-input: var(--radius-input-base);
+  --radius-badge: var(--radius-badge-base);
+  --radius-image: var(--radius-image-base);
+}
+
+/* ------------------------------------------------ */
+/* Theme Variables (in @layer base for proper cascade) */
+/* ------------------------------------------------ */
+
+@layer base {
+  /* Prevent horizontal scroll from fixed elements */
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Default Theme */
+  :root {
+    /* Layout */
+    --header-height: 73px;
+    --assistant-panel-width: 400px;
+
+    --background: oklch(100% 0 0);
+    --foreground: oklch(15% 0 0);
+    --card: oklch(100% 0 0);
+    --card-foreground: oklch(15% 0 0);
+    --popover: oklch(100% 0 0);
+    --popover-foreground: oklch(15% 0 0);
+    --primary: oklch(22% 0 0);
+    --primary-foreground: oklch(99% 0 0);
+    --secondary: oklch(97% 0 0);
+    --secondary-foreground: oklch(22% 0 0);
+    --muted: oklch(97% 0 0);
+    --muted-foreground: oklch(55% 0 0);
+    --accent: oklch(97% 0 0);
+    --accent-foreground: oklch(22% 0 0);
+    --highlight: oklch(97% 0 0 / 30%);
+    --destructive: oklch(63% 0.24 29);
+    --destructive-foreground: oklch(99% 0 0);
+    --success: oklch(82% 0.12 142);
+    --success-foreground: oklch(22% 0 0);
+    --border: oklch(92% 0 0);
+    --input: oklch(92% 0 0);
+    --ring: oklch(15% 0 0);
+    /* Semantic radius - default values */
+    --radius-card-base: 0.5rem;
+    --radius-button-base: 0.375rem;
+    --radius-input-base: 0.375rem;
+    --radius-badge-base: 9999px;
+    --radius-image-base: 0.25rem;
+  }
+
+  /* Theme Ecommerce - Purple accent, rounded corners */
+  .theme-ecommerce {
+    font-family: 'Satoshi', system-ui, sans-serif;
+    --primary: oklch(22% 0 0);
+    --primary-foreground: oklch(99% 0 0);
+    --secondary: oklch(97% 0 0);
+    --secondary-foreground: oklch(22% 0 0);
+    --accent: oklch(50% 0.15 295);
+    --accent-foreground: oklch(99% 0 0);
+    --highlight: oklch(50% 0.15 295 / 25%);
+    --muted: oklch(97% 0 0);
+    --muted-foreground: oklch(55% 0 0);
+    --border: oklch(92% 0 0);
+    --card: oklch(100% 0 0);
+    --card-foreground: oklch(22% 0 0);
+    /* Semantic radius - ecommerce (rounded, friendly) */
+    --radius-card-base: 0.5rem;
+    --radius-button-base: 0.375rem;
+    --radius-input-base: 0.375rem;
+    --radius-badge-base: 9999px;
+    --radius-image-base: 0.25rem;
+  }
+
+  /* Theme Fashion - Minimal black & white palette, sharp corners */
+  .theme-fashion {
+    font-family: 'Inter', system-ui, sans-serif;
+    --primary: oklch(15% 0 0);
+    --primary-foreground: oklch(98% 0 0);
+    --secondary: oklch(96% 0 0);
+    --secondary-foreground: oklch(15% 0 0);
+    --accent: oklch(15% 0 0);
+    --accent-foreground: oklch(98% 0 0);
+    --highlight: oklch(15% 0 0 / 12%);
+    --muted: oklch(96% 0 0);
+    --muted-foreground: oklch(45% 0 0);
+    --border: oklch(88% 0 0);
+    --card: oklch(98% 0 0);
+    --card-foreground: oklch(15% 0 0);
+    /* Semantic radius - fashion (sharp, minimal) */
+    --radius-card-base: 0rem;
+    --radius-button-base: 0rem;
+    --radius-input-base: 0rem;
+    --radius-badge-base: 0rem;
+    --radius-image-base: 0rem;
+  }
+}
+
+/* ------------------------------------------------ */
+/* Autocomplete Widget Overrides                    */
+/* ------------------------------------------------ */
+
+/* Input and panel width */
+.ais-Autocomplete {
+  width: 100%;
+  max-width: 800px;
+}
+
+.ais-Autocomplete-panel {
+  width: 700px;
+  max-width: 90vw;
+}
+
+.ais-AutocompletePanelLayout {
+  width: 100%;
+}
+
+/* Result item background and padding reset */
+.ais-AutocompleteIndexItem {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Result item hover and selected state */
+.ais-AutocompleteIndexItem:hover,
+.ais-AutocompleteIndexItem[aria-selected='true'] {
+  background: var(--color-muted) !important;
+}
+
+/* Search icon color */
+.ais-AutocompleteSubmitIcon,
+.ais-AutocompleteSubmitButtonIcon,
+.ais-AutocompleteDetachedSearchIcon,
+.ais-AutocompleteDetachedSearchButtonIcon {
+  color: var(--color-primary) !important;
+}
+
+/* Input border and radius - consistent with buttons/cards */
+.ais-Autocomplete .ais-AutocompleteForm,
+.ais-AutocompleteDetachedOverlay .ais-AutocompleteForm {
+  position: relative;
+  z-index: 1; /* Creates stacking context so AI button z-index is scoped to form */
+  background-color: var(--color-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  height: 44px;
+  padding: 0 16px;
+  padding-right: 100px; /* Space for AI button */
+  transition: all 200ms ease;
+}
+
+/* AI Mode Button inside SearchBox */
+.ais-Autocomplete .aa-AIButton,
+.ais-AutocompleteForm .aa-AIButton,
+button.aa-AIButton[type='button'] {
+  /* Reset button defaults without using all:unset */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 12px !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  color: var(--foreground, #000) !important;
+  background: transparent !important;
+  border-style: solid !important;
+  border-width: 1px !important;
+  border-color: var(--accent, #6366f1) !important;
+  border-radius: calc(var(--radius-xl, 1rem) - 8px) !important;
+  cursor: pointer !important;
+  transition: all 200ms ease !important;
+}
+
+.ais-Autocomplete .aa-AIButton:hover,
+.ais-AutocompleteForm .aa-AIButton:hover,
+button.aa-AIButton[type='button']:hover {
+  background: var(--accent, #6366f1) !important;
+  color: #fff !important;
+  border-color: var(--accent, #6366f1) !important;
+  transform: translateY(-50%) scale(0.98) !important;
+}
+
+.ais-Autocomplete .aa-AIButton svg,
+.ais-AutocompleteForm .aa-AIButton svg,
+button.aa-AIButton[type='button'] svg {
+  width: 14px !important;
+  height: 14px !important;
+  flex-shrink: 0 !important;
+  color: var(--accent, #6366f1) !important;
+  stroke: var(--accent, #6366f1) !important;
+  transition: all 200ms ease !important;
+}
+
+.ais-Autocomplete .aa-AIButton:hover svg,
+.ais-AutocompleteForm .aa-AIButton:hover svg,
+button.aa-AIButton[type='button']:hover svg {
+  color: #fff !important;
+  stroke: #fff !important;
+}
+
+.ais-Autocomplete .aa-AIButton span,
+.ais-AutocompleteForm .aa-AIButton span,
+button.aa-AIButton[type='button'] span {
+  white-space: nowrap !important;
+}
+
+/* Disabled state */
+.ais-Autocomplete .aa-AIButton--disabled,
+.ais-AutocompleteForm .aa-AIButton--disabled,
+button.aa-AIButton[type='button'].aa-AIButton--disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+/* Input focus state */
+.ais-Autocomplete .ais-AutocompleteForm:focus-within,
+.ais-AutocompleteDetachedOverlay .ais-AutocompleteForm:focus-within,
+.ais-AutocompleteDetachedSearchButton:focus {
+  background-color: hsl(0 0% 100%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 15%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+/* Dropdown panel */
+.ais-Autocomplete-panel {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+  margin-top: 8px;
+  padding: 16px;
+  animation: slideDown 150ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Result item hover */
+.ais-AutocompleteIndexItem:hover,
+.ais-AutocompleteIndexItem[aria-selected='true'] {
+  background: var(--color-muted) !important;
+  border-radius: var(--radius);
+}
+
+/* ------------------------------------------------ */
+/* Hits Widget Overrides                            */
+/* ------------------------------------------------ */
+
+/* Override Hits css from Algolia */
+.ais-Hits-item {
+  background: none !important;
+  align-items: normal !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  font-weight: normal !important;
+  line-height: normal !important;
+  box-shadow: none !important;
+}
+
+/* ------------------------------------------------ */
+/* Highlight Widget Overrides                       */
+/* ------------------------------------------------ */
+
+/* Algolia Highlight component - use accent color with opacity */
+.ais-Highlight-highlighted,
+.ais-Snippet-highlighted {
+  background-color: var(--highlight) !important;
+  color: inherit !important;
+  font-style: normal !important;
+  font-weight: inherit !important;
+  padding: 0.1em 0.2em;
+  border-radius: 0.2em;
+}
+
+/* ------------------------------------------------ */
+/* RefinementList Widget Overrides                  */
+/* ------------------------------------------------ */
+
+/* Facet count - subtle style without border */
+.ais-RefinementList-count {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 0.75rem !important;
+  color: var(--color-muted-foreground) !important;
+  opacity: 0.6;
+}
+
+/* Facet label - normalize casing (lowercase + capitalize first letter) */
+.ais-RefinementList-labelText {
+  display: inline-block;
+  text-transform: lowercase;
+}
+
+.ais-RefinementList-labelText::first-letter {
+  text-transform: uppercase;
+}
+
+/* Utility class for normalize casing */
+.capitalize-first {
+  display: inline-block;
+  text-transform: lowercase;
+}
+
+.capitalize-first::first-letter {
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------ */
+/* View Transitions - Ecommerce Only                */
+/* ------------------------------------------------ */
+
+/* Exit animation (outgoing page) */
+::view-transition-old(.ecom-page-exit) {
+  animation: ecom-fade-out 150ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Enter animation (incoming page) */
+::view-transition-new(.ecom-page-enter) {
+  animation: ecom-fade-in 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes ecom-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ecom-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

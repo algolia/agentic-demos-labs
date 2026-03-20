@@ -1,0 +1,85 @@
+{
+  "name": "ecommerce",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check-format": "prettier --check .",
+    "check-lint": "eslint src && echo 'ESLint passed'",
+    "test": "vitest",
+    "test-all": "npm run check-format && npm run check-lint && vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.2.4",
+    "@tanstack/react-query": "^5.90.17",
+    "algoliasearch": "^5.48.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "instantsearch.css": "^8.11.0",
+    "instantsearch.js": "^4.89.0",
+    "jotai": "^2.16.2",
+    "lucide": "^0.563.0",
+    "lucide-react": "^0.561.0",
+    "motion": "^12.26.2",
+    "next": "^16.2.0",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-instantsearch": "^7.23.1",
+    "react-instantsearch-nextjs": "^1.1.0",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^25.0.2",
+    "@types/react": "^19.2.7",
+    "@typescript-eslint/eslint-plugin": "^8.50.0",
+    "@typescript-eslint/parser": "^8.50.0",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/coverage-v8": "^4.1.0",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^0.2.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-no-relative-import-paths": "^1.6.1",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "husky": "^9.1.7",
+    "jsdom": "^24.1.0",
+    "lint-staged": "^16.4.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}
