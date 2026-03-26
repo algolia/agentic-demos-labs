@@ -26,12 +26,12 @@ const VARIANT_CLASSES: Record<Variant, VariantClasses> = {
   standard: {
     header: 'bg-background border-b border-border',
     container: 'container mx-auto px-6 py-3',
-    innerWrapper: 'flex items-center gap-8',
-    leftSection: 'flex items-center shrink-0',
+    innerWrapper: 'flex items-center lg:gap-8',
+    leftSection: 'flex items-center flex-1 lg:flex-none shrink-0',
     logo: '',
     nav: 'hidden',
     link: '',
-    centerSection: 'flex-1 flex justify-center max-w-2xl mx-auto',
+    centerSection: 'flex justify-center lg:flex-1 lg:max-w-2xl lg:mx-auto',
     rightSection: 'flex items-center gap-2 shrink-0',
   },
   editorial: {

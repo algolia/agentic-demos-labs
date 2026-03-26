@@ -8,6 +8,7 @@ import 'instantsearch.css/themes/satellite.css'
 import {
   useAIButtonInjection,
   useAutocompleteIndices,
+  useDetachedBackButton,
 } from '@/components/autocomplete/hooks'
 import { isAIAssistantOpenState } from '@/features/aiAssistant'
 
@@ -70,6 +71,7 @@ export const AutocompleteWidget = ({
   const isOnSearchPage = pathname.includes('/search')
 
   useAIButtonInjection({ enabled: showAIButton, basePath })
+  useDetachedBackButton()
 
   const {
     indices,

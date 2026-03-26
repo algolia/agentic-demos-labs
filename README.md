@@ -1,19 +1,34 @@
-# Spencer & Williams
+# Spencer and Williams
 
-A multi-vertical demo platform built with Next.js 16 and Algolia. Each vertical (ecommerce, fashion, etc.) is a fully self-contained demo with its own configuration, theme, and search experience.
+Spencer and Williams is a versatile and comprehensive demo platform, designed to showcase the depth of Algolia's features across multiple verticals.
 
-## Getting Started
+### Prerequisites
+
+- Node.js 16+ (or a compatible LTS)
+- npm (bundled with Node) or Yarn
+
+### Quick start
+
+- Install dependencies:
 
 ```bash
-# Install dependencies
 npm install
+```
 
-# Run the development server
+- Run development server:
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the landing page, which auto-discovers all available verticals.
+- Build for production:
 
-## Documentation
+```bash
+npm run build
+```
 
-[To be added here]
+- Run tests:
+
+```bash
+npm test
+```
