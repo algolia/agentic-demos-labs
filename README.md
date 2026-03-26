@@ -16,4 +16,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the landing page, wh
 
 ## Documentation
 
-[To be added here]
+- [Getting Started](./docs/getting-started.md) — setup, configuration, and project structure
+- [Agent Setup](./docs/agent-setup.md) — how to create the AI agents in Algolia Agent Studio
+- [Architecture](./docs/architecture.md) — how the AI search bar button, chat panel, and tool execution work end-to-end
+- [Guardrails](./docs/guardrails.md) — add content safety classification before messages reach your agent

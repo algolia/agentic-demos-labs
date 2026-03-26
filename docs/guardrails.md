@@ -10,7 +10,7 @@ A guardrail cannot accurately classify messages in isolation. Consider these exa
 
 * "16" \- Could be age (flag as MINOR) or a product size (NO\_VIOLATION)  
 * "green" \- Could be answering about product color (NO\_VIOLATION) or political party affiliation (POLITICAL)  
-* "okay" \- Meaning depends entirely on what the assistant just asked
+* "okay" \- Meaning depecommerce/src/app/config.ts:38ends entirely on what the assistant just asked
 
 Without context, your guardrail will produce false positives and miss real violations.
 
