@@ -2,10 +2,6 @@ import {
   displayResultsToolHandler,
   DISPLAY_RESULTS_TOOL_NAME,
 } from '@/features/aiAssistant/tools/displayResultsTool'
-import {
-  searchToolHandler,
-  SEARCH_TOOL_NAME,
-} from '@/features/aiAssistant/tools/searchTool'
 import type { ToolHandler } from '@/features/aiAssistant/types'
 
 /**
@@ -14,7 +10,6 @@ import type { ToolHandler } from '@/features/aiAssistant/types'
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toolHandlers: Record<string, ToolHandler<any>> = {
-  [SEARCH_TOOL_NAME]: searchToolHandler,
   [DISPLAY_RESULTS_TOOL_NAME]: displayResultsToolHandler,
 }
 

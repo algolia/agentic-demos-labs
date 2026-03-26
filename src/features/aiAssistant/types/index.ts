@@ -52,27 +52,14 @@ export interface ProductSummary {
  */
 export interface ToolExecutionContext {
   assistantMessageId: string
+  toolCallId: string
+  toolCallArgs: Record<string, unknown>
   signal?: AbortSignal
   // Message state operations
   appendDisplayResults: (messageId: string, data: DisplayResultsData) => void
   appendNoResultsMessage: (messageId: string) => void
-  // Search operations
-  executeSearch: (queries: SearchQuery[]) => Promise<{
-    productSummaries: ProductSummary[]
-  }>
   // Streaming display
   setStreamingDisplay: (state: StreamingDisplayState | null) => void
-  // Send follow-up to agent (for multi-step tools like search)
-  sendFollowUp: (
-    productSummaries: ProductSummary[],
-  ) => Promise<{ toolCalls: ToolCall[]; suggestions: string[] }>
-  // Send a tool result back to the agent
-  sendToolResult: (
-    toolCallId: string,
-    toolName: string,
-    toolInput: Record<string, unknown>,
-    output: unknown,
-  ) => Promise<{ textContent: string; toolCalls: ToolCall[]; suggestions: string[] }>
 }
 
 /**

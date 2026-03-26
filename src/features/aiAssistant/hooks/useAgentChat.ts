@@ -5,7 +5,6 @@ import { useState, useCallback, useRef } from 'react'
 
 import { useAgentClient } from '@/features/aiAssistant/hooks/useAgentClient'
 import { useMessageState } from '@/features/aiAssistant/hooks/useMessageState'
-import { useProductsSearch } from '@/features/aiAssistant/hooks/useProductsSearch'
 import { useToolExecutor } from '@/features/aiAssistant/hooks/useToolExecutor'
 import { productContextState } from '@/features/aiAssistant/stores/aiAssistant'
 import type {
@@ -41,7 +40,6 @@ export const useAgentChat = (): UseAgentChatReturn => {
   const config = useAtomValue(activeConfigAtom)
   const productContext = useAtomValue(productContextState)
   const { sendCompletion, isReady } = useAgentClient()
-  const search = useProductsSearch()
 
   // Message state management
   const messageState = useMessageState()
@@ -50,7 +48,6 @@ export const useAgentChat = (): UseAgentChatReturn => {
   const { executeToolCalls, streamingDisplay } = useToolExecutor({
     messageState,
     sendCompletion,
-    search,
   })
 
   // Send a message
@@ -122,7 +119,8 @@ export const useAgentChat = (): UseAgentChatReturn => {
           const toolResult = await executeToolCalls(
             result.toolCalls,
             assistantMessageId,
-            apiMessages,
+            result.textContent,
+            result.messageId,
             abortController.signal,
           )
           if (toolResult.suggestions.length > 0) {
