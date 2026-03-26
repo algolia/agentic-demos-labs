@@ -352,6 +352,26 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
   pointer-events: none !important;
 }
 
+/* Detached search button (mobile) - icon only */
+.ais-AutocompleteDetachedSearchButton {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 8px !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.ais-AutocompleteDetachedSearchButtonPlaceholder,
+.ais-AutocompleteDetachedSearchButtonQuery {
+  display: none !important;
+}
+
+/* Detached cancel button - hidden, replaced by back arrow on submit button */
+.ais-AutocompleteDetachedCancelButton {
+  display: none !important;
+}
+
 /* Input focus state */
 .ais-Autocomplete .ais-AutocompleteForm:focus-within,
 .ais-AutocompleteDetachedOverlay .ais-AutocompleteForm:focus-within,
