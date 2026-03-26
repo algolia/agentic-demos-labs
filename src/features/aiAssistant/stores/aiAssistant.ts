@@ -11,6 +11,7 @@ export const initialAIMessageState = atom<string>('')
 export const initialOrderContextState = atom<OrderContextData | null>(null)
 export const collectedObjectIDsState = atom<string[]>([])
 export const chatMessagesState = atom<ChatMessage[]>([])
+export const conversationIdState = atom<string>(crypto.randomUUID())
 export const suggestionsState = atom<string[]>([])
 
 /**

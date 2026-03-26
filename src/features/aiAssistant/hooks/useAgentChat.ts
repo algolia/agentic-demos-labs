@@ -1,7 +1,7 @@
 'use client'
 
 import { useAtomValue } from 'jotai'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 
 import { useAgentClient } from '@/features/aiAssistant/hooks/useAgentClient'
 import { useMessageState } from '@/features/aiAssistant/hooks/useMessageState'
@@ -35,6 +35,7 @@ interface UseAgentChatReturn {
 export const useAgentChat = (): UseAgentChatReturn => {
   const [status, setStatus] = useState<ChatStatus>('idle')
   const [error, setError] = useState<string | null>(null)
+  const isProcessingRef = useRef(false)
 
   // Config and API
   const config = useAtomValue(activeConfigAtom)
@@ -56,6 +57,8 @@ export const useAgentChat = (): UseAgentChatReturn => {
   const sendMessage = useCallback(
     async (text: string, orderContext?: OrderContextData) => {
       if (!config || !text.trim() || !isReady) return
+      if (isProcessingRef.current) return
+      isProcessingRef.current = true
 
       const abortController = new AbortController()
       messageState.setSuggestions([])
@@ -67,56 +70,36 @@ export const useAgentChat = (): UseAgentChatReturn => {
       setStatus('streaming')
 
       try {
-        // Build API messages from current state, including tool result context
-        const apiMessages = [...messageState.messages, userMessage].map(
-          (msg) => {
-            const parts: Array<{ text?: string }> = []
+        // Build API message for only the new user message
+        const apiMessages: Array<{ role: string; parts: Array<{ text?: string }> }> = []
 
-            for (const p of msg.parts) {
-              if (p.type === 'text' && p.text) {
-                parts.push({ text: p.text })
-              } else if (p.type === 'order_context' && p.orderContext) {
-                // Include order context for post-purchase AI queries
-                const productNames = p.orderContext.items
-                  .map((item) => item.name)
-                  .join(', ')
-                parts.push({
-                  text: `[Order context: Order ${p.orderContext.orderId} containing: ${productNames}]`,
-                })
-              } else if (p.type === 'display_results' && p.displayData) {
-                // Include displayed products as context for the agent
-                const productSummary = p.displayData.groups
-                  .map((g) => {
-                    const products = g.products
-                      ?.map((prod) => prod.objectID)
-                      .join(', ')
-                    return `${g.title}: ${products}`
-                  })
-                  .join('; ')
-                if (productSummary) {
-                  parts.push({
-                    text: `[Previously shown products: ${productSummary}]`,
-                  })
-                }
-              }
-            }
-
-            return { role: msg.role, parts }
-          },
-        )
-
-        // Inject product context if viewing a PDP (prepend to first user message)
-        if (productContext && apiMessages.length > 0) {
-          const contextMessage = {
-            role: 'user' as const,
+        // Inject product context if viewing a PDP
+        if (productContext) {
+          apiMessages.push({
+            role: 'user',
             parts: [
               {
                 text: `[Context: The user is currently viewing this product page. Here is the full product data: ${JSON.stringify(productContext)}]`,
               },
             ],
-          }
-          apiMessages.unshift(contextMessage)
+          })
         }
+
+        // Build parts for the new user message
+        const parts: Array<{ text?: string }> = []
+        for (const p of userMessage.parts) {
+          if (p.type === 'text' && p.text) {
+            parts.push({ text: p.text })
+          } else if (p.type === 'order_context' && p.orderContext) {
+            const productNames = p.orderContext.items
+              .map((item) => item.name)
+              .join(', ')
+            parts.push({
+              text: `[Order context: Order ${p.orderContext.orderId} containing: ${productNames}]`,
+            })
+          }
+        }
+        apiMessages.push({ role: 'user', parts })
 
         // Stream response
         let currentText = ''
@@ -148,7 +131,9 @@ export const useAgentChat = (): UseAgentChatReturn => {
         }
 
         setStatus('idle')
+        isProcessingRef.current = false
       } catch (err) {
+        isProcessingRef.current = false
         if ((err as Error).name === 'AbortError') return
         console.error('[sendMessage] Error:', err)
         setError(

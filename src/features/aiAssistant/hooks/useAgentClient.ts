@@ -8,6 +8,7 @@ import type {
   StreamResult,
   OnToolInputDelta,
 } from '@/features/aiAssistant/streaming/agentStreamParser'
+import { conversationIdState } from '@/features/aiAssistant/stores/aiAssistant'
 import { activeConfigAtom } from '@/stores/activeConfig'
 
 export interface SendCompletionOptions {
@@ -22,6 +23,7 @@ export interface SendCompletionOptions {
  */
 export const useAgentClient = () => {
   const config = useAtomValue(activeConfigAtom)
+  const conversationId = useAtomValue(conversationIdState)
   /**
    * Send a completion request to the Agent Studio API.
    */
@@ -52,7 +54,7 @@ export const useAgentClient = () => {
           'x-algolia-application-id': appId,
           'x-algolia-api-key': apiKey,
         },
-        body: JSON.stringify({ messages }),
+        body: JSON.stringify({ id: conversationId, messages }),
         signal,
       })
 
@@ -67,7 +69,7 @@ export const useAgentClient = () => {
         onToolInputDelta,
       )
     },
-    [config],
+    [config, conversationId],
   )
 
   const isReady = !!config?.features.agentStudio.shoppingAssistantAgentID

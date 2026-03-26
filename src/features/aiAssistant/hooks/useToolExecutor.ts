@@ -45,7 +45,7 @@ export const useToolExecutor = ({
 
   // Create a function to send search results back to agent
   const createSendFollowUp = useCallback(
-    (previousMessages: ApiMessage[], signal?: AbortSignal) =>
+    (_previousMessages: ApiMessage[], signal?: AbortSignal) =>
       async (
         productSummaries: ProductSummary[],
       ): Promise<{ toolCalls: ToolCall[]; suggestions: string[] }> => {
@@ -59,7 +59,7 @@ export const useToolExecutor = ({
         }
 
         const result = await sendCompletion(
-          [...previousMessages, resultMessage],
+          [resultMessage],
           {
             signal,
             onToolInputDelta: (toolCallId, toolName, _delta, fullBuffer) => {

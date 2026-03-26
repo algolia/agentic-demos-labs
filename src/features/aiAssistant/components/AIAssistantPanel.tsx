@@ -3,10 +3,18 @@
 import { Maximize2, Minimize2, Sparkles, Trash2, X } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 
+import { useAtom, useAtomValue } from 'jotai'
+import { useCallback } from 'react'
+
 import { Tooltip } from '@/components/ui/Tooltip'
 import { AIAssistantChat } from '@/features/aiAssistant/components/AIAssistantChat'
-import { useAgentChat } from '@/features/aiAssistant/hooks/useAgentChat'
 import { useAIAssistantPanel } from '@/features/aiAssistant/hooks/useAIAssistantPanel'
+import {
+  chatMessagesState,
+  suggestionsState,
+  collectedObjectIDsState,
+  conversationIdState,
+} from '@/features/aiAssistant/stores/aiAssistant'
 import { useBodyScrollLock } from '@/features/aiAssistant/hooks/useBodyScrollLock'
 import { useIsAIAssistantRoute } from '@/features/aiAssistant/hooks/useIsAIAssistantRoute'
 import { useStickyOffset } from '@/features/aiAssistant/hooks/useStickyOffset'
@@ -36,7 +44,17 @@ export const AIAssistantPanel = ({ basePath }: AIAssistantPanelProps) => {
   } = useAIAssistantPanel()
   const { isHomepage } = useIsAIAssistantRoute(basePath)
   const isFullscreenOnly = isHomepage && isExpanded
-  const { messages, resetChat } = useAgentChat()
+  const messages = useAtomValue(chatMessagesState)
+  const [, setMessages] = useAtom(chatMessagesState)
+  const [, setSuggestions] = useAtom(suggestionsState)
+  const [, setCollectedObjectIDs] = useAtom(collectedObjectIDsState)
+  const [, setConversationId] = useAtom(conversationIdState)
+  const resetChat = useCallback(() => {
+    setMessages([])
+    setSuggestions([])
+    setCollectedObjectIDs([])
+    setConversationId(crypto.randomUUID())
+  }, [setMessages, setSuggestions, setCollectedObjectIDs, setConversationId])
   const isFullscreen = isExpanded || isMobile
   const panelRef = useStickyOffset(isFullscreen)
 

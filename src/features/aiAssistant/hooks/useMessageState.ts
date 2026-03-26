@@ -7,6 +7,7 @@ import {
   chatMessagesState,
   suggestionsState,
   collectedObjectIDsState,
+  conversationIdState,
 } from '@/features/aiAssistant/stores/aiAssistant'
 import type {
   ChatMessage,
@@ -39,6 +40,7 @@ export const useMessageState = (): MessageStateAPI => {
   const [collectedObjectIDs, setCollectedObjectIDs] = useAtom(
     collectedObjectIDsState,
   )
+  const [, setConversationId] = useAtom(conversationIdState)
 
   const setSuggestions = useCallback(
     (newSuggestions: string[]) => {
@@ -146,7 +148,8 @@ export const useMessageState = (): MessageStateAPI => {
     setMessages([])
     setSuggestionsAtom([])
     setCollectedObjectIDs([])
-  }, [setMessages, setSuggestionsAtom, setCollectedObjectIDs])
+    setConversationId(crypto.randomUUID())
+  }, [setMessages, setSuggestionsAtom, setCollectedObjectIDs, setConversationId])
 
   return {
     messages,
