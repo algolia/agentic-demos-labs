@@ -59,7 +59,7 @@ export const ProductContextCard = () => {
           )}
         </div>
 
-        <div className="bg-background border-border flex w-fit items-center gap-2 rounded-md border p-1.5">
+        <div className="bg-background border-border flex items-center gap-2 rounded-md border p-1.5 min-w-0">
           {image && (
             <div className="bg-muted h-10 w-10 shrink-0 overflow-hidden rounded">
               <img
