@@ -45,7 +45,7 @@ export const useAgentChat = (): UseAgentChatReturn => {
   const messageState = useMessageState()
 
   // Tool execution
-  const { executeToolCalls, streamingDisplay } = useToolExecutor({
+  const { executeToolCalls, streamingDisplay, onToolInputDelta } = useToolExecutor({
     messageState,
     sendCompletion,
   })
@@ -106,6 +106,7 @@ export const useAgentChat = (): UseAgentChatReturn => {
             currentText += delta
             messageState.updateAssistantText(assistantMessageId, currentText)
           },
+          onToolInputDelta,
         })
 
         // Handle suggestions

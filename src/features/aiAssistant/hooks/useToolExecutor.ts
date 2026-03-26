@@ -4,7 +4,8 @@ import { useState, useCallback } from 'react'
 
 import type { SendCompletionOptions } from '@/features/aiAssistant/hooks/useAgentClient'
 import type { MessageStateAPI } from '@/features/aiAssistant/hooks/useMessageState'
-import type { StreamResult } from '@/features/aiAssistant/streaming/agentStreamParser'
+import type { StreamResult, OnToolInputDelta } from '@/features/aiAssistant/streaming/agentStreamParser'
+import { extractDisplayResultsStream } from '@/features/aiAssistant/tools/parsing/displayResultsParser'
 import { getToolHandler } from '@/features/aiAssistant/tools/registry'
 import type {
   ToolCall,
@@ -34,6 +35,23 @@ export const useToolExecutor = ({
 }: UseToolExecutorOptions) => {
   const [streamingDisplay, setStreamingDisplay] =
     useState<StreamingDisplayState | null>(null)
+
+  // Handle streaming tool input for progressive display
+  const onToolInputDelta: OnToolInputDelta = useCallback(
+    (toolCallId, toolName, _delta, fullBuffer) => {
+      if (toolName === 'displayResults') {
+        const extracted = extractDisplayResultsStream(fullBuffer)
+        setStreamingDisplay({
+          intro: extracted.intro,
+          groups: extracted.groups,
+          streamingGroup: extracted.streamingGroup,
+          isStreaming: true,
+          toolCallId,
+        })
+      }
+    },
+    [],
+  )
 
   // Execute tool calls and send results back by updating the last assistant message
   const executeToolCalls = useCallback(
@@ -86,6 +104,9 @@ export const useToolExecutor = ({
           toolResults.set(toolCall.id, { error: String(error) })
         }
       }
+
+      // Clear streaming display now that tools are executed
+      setStreamingDisplay(null)
 
       // Only send results back if we handled any client-side tools
       if (toolResults.size === 0) {
@@ -147,5 +168,6 @@ export const useToolExecutor = ({
   return {
     executeToolCalls,
     streamingDisplay,
+    onToolInputDelta,
   }
 }
