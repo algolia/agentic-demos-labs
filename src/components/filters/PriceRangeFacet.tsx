@@ -57,8 +57,8 @@ export const PriceRangeFacet = ({
         <div className="overflow-visible">
           {/* Price labels */}
           <div className="mb-4 flex items-center justify-between text-sm">
-            <span className="text-foreground">${currentMin}</span>
-            <span className="text-foreground">${currentMax}</span>
+            <span className="text-foreground">{currentMin.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}</span>
+            <span className="text-foreground">{currentMax.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}</span>
           </div>
 
           {/* Dual range slider - h-5 to contain 16px thumbs */}

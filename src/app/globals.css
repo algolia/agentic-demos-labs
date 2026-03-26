@@ -273,8 +273,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   height: 44px;
-  padding: 0 16px;
-  padding-right: 100px; /* Space for AI button */
+  padding: 0 110px 0 0;
   transition: all 200ms ease;
 }
 
@@ -352,6 +351,10 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
   pointer-events: none !important;
 }
 
+.ais-AutocompleteInput {
+  padding-right: 0.5rem !important;
+}
+
 /* Detached search button (mobile) - icon only */
 .ais-AutocompleteDetachedSearchButton {
   background: transparent !important;
@@ -363,8 +366,15 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
 }
 
 .ais-AutocompleteDetachedSearchButtonPlaceholder,
-.ais-AutocompleteDetachedSearchButtonQuery {
+.ais-AutocompleteDetachedSearchButtonQuery,
+.ais-AutocompleteDetachedSearchButtonClear {
   display: none !important;
+}
+
+.ais-AutocompleteDetachedSearchButton:focus {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Detached cancel button - hidden, replaced by back arrow on submit button */

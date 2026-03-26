@@ -13,7 +13,7 @@ import { FilterSuggestionsWidget } from '@/components/results/FilterSuggestionsW
 
 const SearchStats = () => {
   const { nbHits } = useStats()
-  return <span className="text-muted-foreground text-sm">{nbHits} results</span>
+  return <span className="text-muted-foreground text-sm">{nbHits.toLocaleString()} results</span>
 }
 
 interface ProductListingPageProps {

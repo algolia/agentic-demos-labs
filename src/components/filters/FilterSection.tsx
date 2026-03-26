@@ -53,6 +53,12 @@ export const FilterSection = ({
               checkbox: 'hidden',
               count: 'text-xs text-muted-foreground/70',
             }}
+            transformItems={(items) =>
+              items.map((item) => ({
+                ...item,
+                count: item.count.toLocaleString() as unknown as number,
+              }))
+            }
           />
         </div>
       </motion.div>
