@@ -136,7 +136,7 @@ export const AIAssistantPanel = ({ basePath }: AIAssistantPanelProps) => {
               delay: DURATION_NORMAL * CONTENT_FADE_DELAY_RATIO,
               ease: EASE_DEFAULT,
             }}>
-            <AIAssistantChat isExpanded={isExpanded} />
+            <AIAssistantChat isFullscreen={isFullscreen} />
           </motion.div>
         </>
       )}

@@ -18,10 +18,10 @@ import {
 import { cn } from '@/lib/utils'
 
 interface AIAssistantChatProps {
-  isExpanded: boolean
+  isFullscreen: boolean
 }
 
-export const AIAssistantChat = ({ isExpanded }: AIAssistantChatProps) => {
+export const AIAssistantChat = ({ isFullscreen }: AIAssistantChatProps) => {
   const [input, setInput] = useState('')
   const [initialMessage, setInitialMessage] = useAtom(initialAIMessageState)
   const [initialOrderContext, setInitialOrderContext] = useAtom(
@@ -88,13 +88,13 @@ export const AIAssistantChat = ({ isExpanded }: AIAssistantChatProps) => {
         ref={containerRef}
         className={cn(
           'min-h-0 flex-1 space-y-4 overflow-y-auto p-4',
-          isExpanded && 'container mx-auto',
+          isFullscreen && 'container mx-auto',
         )}>
         {/* Product context card - only shown in fullscreen mode, aligned right like user messages */}
-        {isExpanded && <ProductContextCard />}
+        {isFullscreen && <ProductContextCard />}
 
         {messages.length === 0 && !streamingDisplay && (
-          <div className="flex h-full items-center justify-center">
+          <div className="flex items-center justify-center py-8">
             <p className="text-muted-foreground text-sm">
               Ask me anything about our products!
             </p>
@@ -165,7 +165,7 @@ export const AIAssistantChat = ({ isExpanded }: AIAssistantChatProps) => {
       <div className="border-border shrink-0 border-t">
         <form
           onSubmit={handleSubmit}
-          className={cn('flex gap-2 p-4', isExpanded && 'container mx-auto')}>
+          className={cn('flex gap-2 p-4', isFullscreen && 'container mx-auto')}>
           <input
             type="text"
             value={input}
