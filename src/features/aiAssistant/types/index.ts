@@ -66,6 +66,13 @@ export interface ToolExecutionContext {
   sendFollowUp: (
     productSummaries: ProductSummary[],
   ) => Promise<{ toolCalls: ToolCall[]; suggestions: string[] }>
+  // Send a tool result back to the agent
+  sendToolResult: (
+    toolCallId: string,
+    toolName: string,
+    toolInput: Record<string, unknown>,
+    output: unknown,
+  ) => Promise<{ textContent: string; toolCalls: ToolCall[]; suggestions: string[] }>
 }
 
 /**

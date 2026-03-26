@@ -55,7 +55,8 @@ const executeSearch = async (
 
     context.setStreamingDisplay(null)
 
-    // Handle displayResults from agent response
+    // Handle displayResults from agent response and send its result back
+    let finalSuggestions = followUpResult.suggestions
     for (const toolCall of followUpResult.toolCalls) {
       if (toolCall.name === 'displayResults') {
         const data = toolCall.args as unknown as DisplayResultsData
@@ -64,11 +65,22 @@ const executeSearch = async (
         } else {
           context.appendNoResultsMessage(context.assistantMessageId)
         }
+
+        // Send displayResults tool result back to the agent so it can continue
+        const displayResult = await context.sendToolResult(
+          toolCall.id,
+          toolCall.name,
+          toolCall.args,
+          true,
+        )
+        if (displayResult.suggestions.length > 0) {
+          finalSuggestions = displayResult.suggestions
+        }
       }
     }
 
     return {
-      suggestions: followUpResult.suggestions,
+      suggestions: finalSuggestions,
     }
   } catch (error) {
     context.setStreamingDisplay(null)

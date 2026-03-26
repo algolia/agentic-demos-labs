@@ -29,7 +29,7 @@ export const useAgentClient = () => {
    */
   const sendCompletion = useCallback(
     async (
-      messages: Array<{ role: string; parts: Array<{ text?: string }> }>,
+      messages: Array<{ role: string; [key: string]: unknown }>,
       options: SendCompletionOptions = {},
     ): Promise<StreamResult> => {
       if (!config) {

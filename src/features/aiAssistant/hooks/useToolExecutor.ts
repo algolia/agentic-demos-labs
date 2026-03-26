@@ -16,10 +16,10 @@ import type {
   ProductSummary,
 } from '@/features/aiAssistant/types'
 
-type ApiMessage = { role: string; parts: Array<{ text?: string }> }
+type ApiMessage = { role: string; [key: string]: unknown }
 
 type SendCompletionFn = (
-  messages: Array<{ role: string; parts: Array<{ text?: string }> }>,
+  messages: ApiMessage[],
   options?: SendCompletionOptions,
 ) => Promise<StreamResult>
 
@@ -43,34 +43,55 @@ export const useToolExecutor = ({
   const [streamingDisplay, setStreamingDisplay] =
     useState<StreamingDisplayState | null>(null)
 
-  // Create a function to send search results back to agent
+  // Send a tool result back to the agent (AI SDK v5 format)
+  const sendToolResult = useCallback(
+    async (
+      toolCallId: string,
+      toolName: string,
+      toolInput: Record<string, unknown>,
+      output: unknown,
+      options?: SendCompletionOptions & { signal?: AbortSignal },
+    ): Promise<StreamResult> => {
+      const resultMessage: ApiMessage = {
+        role: 'assistant',
+        parts: [
+          {
+            type: `tool-${toolName}`,
+            tool_call_id: toolCallId,
+            state: 'output-available',
+            input: toolInput,
+            output,
+          },
+        ],
+      }
+
+      return sendCompletion([resultMessage], options)
+    },
+    [sendCompletion],
+  )
+
+  // Send search results back to agent, handling the displayResults follow-up
   const createSendFollowUp = useCallback(
-    (_previousMessages: ApiMessage[], signal?: AbortSignal) =>
+    (toolCallId: string, toolName: string, toolInput: Record<string, unknown>, signal?: AbortSignal) =>
       async (
         productSummaries: ProductSummary[],
       ): Promise<{ toolCalls: ToolCall[]; suggestions: string[] }> => {
-        const resultMessage = {
-          role: 'user',
-          parts: [
-            {
-              text: `Here are the search results I found: ${JSON.stringify(productSummaries)}. Now please call the displayResults tool to show them to the user.`,
-            },
-          ],
-        }
-
-        const result = await sendCompletion(
-          [resultMessage],
+        const result = await sendToolResult(
+          toolCallId,
+          toolName,
+          toolInput,
+          productSummaries,
           {
             signal,
-            onToolInputDelta: (toolCallId, toolName, _delta, fullBuffer) => {
-              if (toolName === 'displayResults') {
+            onToolInputDelta: (tcId, tcName, _delta, fullBuffer) => {
+              if (tcName === 'displayResults') {
                 const extracted = extractDisplayResultsStream(fullBuffer)
                 setStreamingDisplay({
                   intro: extracted.intro,
                   groups: extracted.groups,
                   streamingGroup: extracted.streamingGroup,
                   isStreaming: true,
-                  toolCallId,
+                  toolCallId: tcId,
                 })
               }
             },
@@ -82,7 +103,7 @@ export const useToolExecutor = ({
           suggestions: result.suggestions,
         }
       },
-    [sendCompletion],
+    [sendToolResult],
   )
 
   // Execute tool calls using the registry
@@ -90,7 +111,7 @@ export const useToolExecutor = ({
     async (
       toolCalls: ToolCall[],
       assistantMessageId: string,
-      previousApiMessages: ApiMessage[],
+      _previousApiMessages: ApiMessage[],
       signal?: AbortSignal,
     ): Promise<{ suggestions: string[] }> => {
       let finalSuggestions: string[] = []
@@ -117,7 +138,11 @@ export const useToolExecutor = ({
           appendNoResultsMessage: messageState.appendNoResultsMessage,
           executeSearch: search,
           setStreamingDisplay,
-          sendFollowUp: createSendFollowUp(previousApiMessages, signal),
+          sendFollowUp: createSendFollowUp(toolCall.id, toolCall.name, toolCall.args, signal),
+          sendToolResult: async (tcId, tcName, tcInput, output) => {
+            const res = await sendToolResult(tcId, tcName, tcInput, output, { signal })
+            return { textContent: res.textContent, toolCalls: res.toolCalls, suggestions: res.suggestions }
+          },
         }
 
         try {
@@ -134,7 +159,7 @@ export const useToolExecutor = ({
 
       return { suggestions: finalSuggestions }
     },
-    [messageState, search, createSendFollowUp],
+    [messageState, search, createSendFollowUp, sendToolResult],
   )
 
   return {
