@@ -16,7 +16,7 @@ export interface Cart {
 
 const initialCart: Cart = {
   items: [],
-  updatedAt: Date.now(),
+  updatedAt: 0,
 }
 
 const getStorageKey = (vertical: string) => `spencer-williams-${vertical}-cart`

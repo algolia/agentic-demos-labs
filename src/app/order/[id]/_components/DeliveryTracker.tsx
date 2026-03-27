@@ -2,6 +2,7 @@
 
 import { Check, Package, Truck } from 'lucide-react'
 import { motion } from 'motion/react'
+import { useEffect, useState } from 'react'
 
 import { EASE_SMOOTH } from '@/lib/animations'
 
@@ -11,27 +12,20 @@ const formatDate = (d: Date): string =>
 const CURRENT_STEP = 1
 
 export const DeliveryTracker = () => {
-  const now = new Date()
-  const steps = [
-    {
-      id: 1,
-      label: 'Confirmed',
-      date: formatDate(now),
-      icon: <Check className="h-4 w-4" />,
-    },
-    {
-      id: 2,
-      label: 'In Transit',
-      date: formatDate(new Date(now.getTime() + 2 * 86400000)),
-      icon: <Truck className="h-4 w-4" />,
-    },
-    {
-      id: 3,
-      label: 'Delivered',
-      date: formatDate(new Date(now.getTime() + 5 * 86400000)),
-      icon: <Package className="h-4 w-4" />,
-    },
-  ]
+  const [steps, setSteps] = useState([
+    { id: 1, label: 'Confirmed', date: '', icon: <Check className="h-4 w-4" /> },
+    { id: 2, label: 'In Transit', date: '', icon: <Truck className="h-4 w-4" /> },
+    { id: 3, label: 'Delivered', date: '', icon: <Package className="h-4 w-4" /> },
+  ])
+
+  useEffect(() => {
+    const now = new Date()
+    setSteps([
+      { id: 1, label: 'Confirmed', date: formatDate(now), icon: <Check className="h-4 w-4" /> },
+      { id: 2, label: 'In Transit', date: formatDate(new Date(now.getTime() + 2 * 86400000)), icon: <Truck className="h-4 w-4" /> },
+      { id: 3, label: 'Delivered', date: formatDate(new Date(now.getTime() + 5 * 86400000)), icon: <Package className="h-4 w-4" /> },
+    ])
+  }, [])
 
   return (
     <div className="border-border bg-card rounded-card border p-6">
