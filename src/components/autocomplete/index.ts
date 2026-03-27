@@ -3,5 +3,4 @@ export { AutocompleteSectionHeader } from '@/components/autocomplete/Autocomplet
 export {
   ProductHit,
   SuggestionHit,
-  AISuggestionsHit,
 } from '@/components/autocomplete/hits'

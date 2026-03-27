@@ -7,7 +7,6 @@ import { Footer } from '@/components/footer/Footer'
 import { Header } from '@/components/header/Header'
 import { Providers } from '@/components/providers/Providers'
 import { CartBadge } from '@/components/ui/CartBadge'
-import { AIAssistantLayout } from '@/features/aiAssistant'
 
 import type { Metadata } from 'next'
 
@@ -35,8 +34,6 @@ const RootLayout = ({
               basePath=""
               placeholder="What are you looking for today?"
               showSuggestions
-              showAISuggestions
-              showAIButton
             />
           </Header.CenterSection>
           <Header.RightSection>
@@ -50,7 +47,7 @@ const RootLayout = ({
           </Header.RightSection>
         </Header>
         <main className="flex-1">
-          <AIAssistantLayout basePath="">{children}</AIAssistantLayout>
+          {children}
         </main>
         <Footer variant="standard" name={config.name} />
       </Providers>

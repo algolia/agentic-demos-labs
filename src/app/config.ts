@@ -43,9 +43,7 @@ export const ecommerceConfig: VerticalConfig = {
   },
   features: {
     agentStudio: {
-      filterSuggestionsAgentID: '28a3b041-70ea-4837-9e78-d51a0fae0607',
-      shoppingAssistantAgentID: '2aea6c27-1121-4932-a93f-33fc2857a73d',
-      questionSuggestionsAgentID: '13a8ed2c-f4bf-4c13-acd0-681fd07ead9a',
+      shoppingAssistantAgentID: '',
     },
   },
   carouselCategories: [

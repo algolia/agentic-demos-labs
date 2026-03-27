@@ -2,7 +2,6 @@
 
 import { AutocompleteSectionHeader } from '@/components/autocomplete/AutocompleteSectionHeader'
 import {
-  AISuggestionsHit,
   ProductHit,
   SuggestionHit,
 } from '@/components/autocomplete/hits'
@@ -22,7 +21,6 @@ export const useAutocompleteIndices = ({
   hitsPerPage,
   showProducts,
   showSuggestions,
-  showAISuggestions,
   showRecent,
 }: UseAutocompleteIndicesParams) => {
   const { algolia } = useActiveConfig()
@@ -74,32 +72,6 @@ export const useAutocompleteIndices = ({
         }
       : undefined
 
-  const aiSuggestionsConfig =
-    showAISuggestions && algolia?.indices?.aiSuggestionsIndex
-      ? {
-          indexName: algolia.indices.aiSuggestionsIndex,
-          headerComponent: () => (
-            <AutocompleteSectionHeader>
-              AI Suggestions
-            </AutocompleteSectionHeader>
-          ),
-          itemComponent: ({
-            item,
-            onSelect,
-          }: {
-            item: Record<string, unknown>
-            onSelect: () => void
-          }) => (
-            <AISuggestionsHit
-              item={item}
-              basePath={basePath}
-              onSelect={onSelect}
-            />
-          ),
-          getURL: () => `${basePath}/search`,
-        }
-      : undefined
-
   const recentConfig = showRecent
     ? {
         headerComponent: () => (
@@ -108,16 +80,10 @@ export const useAutocompleteIndices = ({
       }
     : undefined
 
-  const allIndices = [
-    ...productsIndex,
-    ...(aiSuggestionsConfig ? [aiSuggestionsConfig] : []),
-  ]
-
   return {
-    indices: allIndices,
+    indices: productsIndex,
     suggestionsConfig,
     recentConfig,
     productsIndexName: algolia?.indices?.productsIndex,
-    aiSuggestionsIndexName: algolia?.indices?.aiSuggestionsIndex,
   }
 }

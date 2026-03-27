@@ -10,17 +10,12 @@ import {
   ProductInfo,
 } from '@/app/product/[id]/_components'
 import { ProductImageGallery } from '@/components/product/ProductImageGallery'
-import { ProductAIQuestions } from '@/features/aiAssistant/components/ProductAIQuestions'
-import { useSetProductContext } from '@/features/aiAssistant/hooks/useSetProductContext'
 import { useProduct, type ProductHit } from '@/hooks/useProduct'
 
 const ProductContent = ({ product }: { product: ProductHit }) => {
   const imagePrefix = ecommerceConfig.algolia.hitTemplate.imageHrefPrefix
   const mainImage = product.image ? `${imagePrefix}${product.image}` : null
   const images = mainImage ? [mainImage, mainImage, mainImage, mainImage] : []
-
-  // Set product context for AI assistant
-  useSetProductContext(product as unknown as Record<string, unknown>)
 
   return (
     <div className="container mx-auto px-6 py-8">
@@ -32,11 +27,6 @@ const ProductContent = ({ product }: { product: ProductHit }) => {
         <div className="space-y-5">
           <ProductInfo name={product.name} brand={product.brand} />
           <ProductActions product={product} />
-          <ProductAIQuestions
-            productName={product.name}
-            basePath=""
-            productData={product as unknown as Record<string, unknown>}
-          />
         </div>
       </div>
     </div>

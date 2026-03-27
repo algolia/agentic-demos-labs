@@ -9,7 +9,6 @@ import { CurrentRefinements } from '@/components/filters/CurrentRefinements'
 import { FilterSection } from '@/components/filters/FilterSection'
 import { PriceRangeFacet } from '@/components/filters/PriceRangeFacet'
 import { Hit } from '@/components/hit/Hit'
-import { FilterSuggestionsWidget } from '@/components/results/FilterSuggestionsWidget'
 
 const SearchStats = () => {
   const { nbHits } = useStats()
@@ -63,19 +62,6 @@ export const ProductListingPage = ({ title }: ProductListingPageProps) => (
 
       {/* Product Grid */}
       <div className="lg:col-span-3">
-        {/* AI Filter Suggestions */}
-        <div className="mb-6">
-          <FilterSuggestionsWidget
-            variant="standard"
-            agentId={
-              ecommerceConfig.features.agentStudio.filterSuggestionsAgentID
-            }
-            attributes={ecommerceConfig.algolia.facets.filter(
-              (f) => f !== 'price',
-            )}
-          />
-        </div>
-
         <Hits
           hitComponent={({ hit }) => (
             <Hit
