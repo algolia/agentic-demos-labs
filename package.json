@@ -41,7 +41,6 @@
     "instantsearch.css": "^8.11.0",
     "instantsearch.js": "^4.89.0",
     "jotai": "^2.16.2",
-    "lucide": "^0.563.0",
     "lucide-react": "^0.561.0",
     "motion": "^12.26.2",
     "next": "^16.2.0",
