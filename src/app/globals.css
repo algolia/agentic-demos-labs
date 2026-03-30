@@ -421,6 +421,433 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
 }
 
 /* ------------------------------------------------ */
+/* Chat Widget Overrides (Agent Studio)             */
+/* ------------------------------------------------ */
+
+/**
+ * The Chat widget from react-instantsearch uses its own CSS custom properties
+ * (prefixed with --ais-). To make the widget match your app's design system,
+ * override these variables. The widget reads them at runtime, so changes here
+ * propagate to all Chat sub-components automatically.
+ *
+ * Key variables:
+ *   --ais-primary-color-rgb     → Toggle button, accents, links
+ *   --ais-text-color-rgb        → All text in the widget
+ *   --ais-border-color-rgb      → Panel borders, dividers
+ *   --ais-background-color-rgb  → Panel background
+ *   --ais-chat-width            → Panel width (default: 22.5rem)
+ *   --ais-chat-height           → Panel height (default: 70%)
+ *   --ais-chat-margin           → Distance from viewport edges
+ *
+ * @see https://www.algolia.com/doc/api-reference/widgets/chat/react
+ */
+
+/* Map the Chat widget's color tokens to the app's theme-ecommerce palette.
+   We use the purple accent (oklch(50% 0.15 295)) converted to RGB for the
+   --ais-primary-color-rgb variable. */
+.theme-ecommerce {
+  /* Purple accent (~#7c3aed in sRGB) */
+  --ais-primary-color-rgb: 124, 58, 237;
+
+  /* Panel sizing — docked sidebar that fills the right edge of the viewport */
+  --ais-chat-width: var(--assistant-panel-width);
+  --ais-chat-height: calc(100dvh - var(--header-height));
+  --ais-chat-maximized-height: calc(100dvh - var(--header-height));
+  --ais-chat-margin: 0px;
+
+  /* Border radius — no rounding for a docked sidebar */
+  --ais-border-radius-lg: 0px;
+
+  /* Shadow — a subtle left border shadow instead of floating shadow */
+  --ais-shadow-md: -1px 0 0 0 var(--border);
+
+  /* Font — inherit from the theme */
+  --ais-font-family: 'Satoshi', system-ui, sans-serif;
+}
+
+/* ---- Sidebar Container ---- */
+/**
+ * The chat sidebar is part of the document flow, not a fixed overlay.
+ * When the Chat widget opens, the sidebar expands from 0 to
+ * var(--assistant-panel-width), pushing the main content left.
+ *
+ * The `chat-sidebar` class wraps the Chat widget and controls the layout
+ * transition. The inner `.ais-Chat` widget is restyled from fixed to static
+ * positioning so it fills the sidebar naturally.
+ */
+.chat-sidebar {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100dvh - var(--header-height));
+  flex-shrink: 0;
+  border-left: 0px solid var(--border);
+  z-index: 40;
+}
+
+/* When the Chat widget's container has the --open class, expand the sidebar */
+.chat-sidebar:has(.ais-Chat-container--open) {
+  width: var(--assistant-panel-width);
+  min-width: var(--assistant-panel-width);
+  border-left-width: 1px;
+}
+
+/* ---- Override Chat widget from fixed to static ---- */
+/**
+ * By default the Chat widget uses `position: fixed`. We override it to fill
+ * its parent sidebar container instead.
+ */
+.chat-sidebar .ais-Chat.ais-Chat {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: unset !important;
+  max-height: unset !important;
+  font-family: var(--ais-font-family, inherit);
+}
+
+/* The inner container fills the sidebar and has no rounded corners or shadow */
+.chat-sidebar .ais-Chat .ais-Chat-container {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  height: 100% !important;
+  width: var(--assistant-panel-width) !important;
+}
+
+/* Hide the floating toggle button visually — we use the "AI mode" button in the
+   search bar instead. We use size/opacity/pointer-events instead of display:none
+   so the button remains clickable programmatically by useAIButtonInjection. */
+.chat-sidebar .ais-Chat .ais-Chat-toggleButtonWrapper {
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+}
+
+/* --- Header --- */
+/* Clean header with a subtle bottom border, no gradient fade, no sparkle icon */
+.chat-sidebar .ais-Chat .ais-ChatHeader {
+  border-bottom: 1px solid var(--border) !important;
+  padding: 14px 16px !important;
+}
+.chat-sidebar .ais-Chat .ais-ChatHeader::after {
+  display: none !important;
+}
+/* Hide the sparkle icon next to the title — text-only header */
+.chat-sidebar .ais-Chat .ais-ChatHeader-titleIcon {
+  display: none !important;
+}
+/* Bolder title */
+.chat-sidebar .ais-Chat .ais-ChatHeader-title {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+/**
+ * Reorder header action buttons to match the target: expand → trash → close.
+ * The widget renders them as: clear → maximize → close.
+ * We use CSS `order` to rearrange, and hide the "Clear" text label so only
+ * the trash icon is visible.
+ */
+.chat-sidebar .ais-Chat .ais-ChatHeader-actions {
+  gap: 16px !important;
+  color: oklch(65% 0 0) !important;
+}
+.chat-sidebar .ais-Chat .ais-ChatHeader-actions button {
+  color: oklch(65% 0 0) !important;
+  opacity: 0.8 !important;
+}
+.chat-sidebar .ais-Chat .ais-ChatHeader-actions button:hover {
+  opacity: 1 !important;
+}
+/* Expand/maximize first — replace with Maximize2 icon (Lucide) */
+.chat-sidebar .ais-Chat .ais-ChatHeader-maximize {
+  order: 1 !important;
+  position: relative !important;
+  width: 16px !important;
+  height: 16px !important;
+  padding: 0 !important;
+}
+.chat-sidebar .ais-Chat .ais-ChatHeader-maximize svg {
+  display: none !important;
+}
+.chat-sidebar .ais-Chat .ais-ChatHeader-maximize::after {
+  content: '' !important;
+  display: block !important;
+  width: 18px !important;
+  height: 18px !important;
+  background-color: currentColor !important;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='m21 3-7 7'/%3E%3Cpath d='m3 21 7-7'/%3E%3Cpath d='M9 21H3v-6'/%3E%3C/svg%3E") !important;
+  mask-size: contain !important;
+  mask-repeat: no-repeat !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='m21 3-7 7'/%3E%3Cpath d='m3 21 7-7'/%3E%3Cpath d='M9 21H3v-6'/%3E%3C/svg%3E") !important;
+  -webkit-mask-size: contain !important;
+  -webkit-mask-repeat: no-repeat !important;
+}
+/* Clear/trash second — replace default content with a Trash2 icon (Lucide).
+   We hide everything inside the button and inject an SVG via a pseudo-element. */
+.chat-sidebar .ais-Chat .ais-ChatHeader-clear {
+  order: 2 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  gap: 0 !important;
+  position: relative !important;
+  width: 16px !important;
+  height: 16px !important;
+  padding: 0 !important;
+}
+/* Hide the default SVG icon */
+.chat-sidebar .ais-Chat .ais-ChatHeader-clear svg {
+  display: none !important;
+}
+/* Inject the Trash2 icon via CSS mask — matches the Lucide trash-2 icon */
+.chat-sidebar .ais-Chat .ais-ChatHeader-clear::after {
+  content: '' !important;
+  display: block !important;
+  width: 18px !important;
+  height: 18px !important;
+  background-color: currentColor !important;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 11v6'/%3E%3Cpath d='M14 11v6'/%3E%3Cpath d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'/%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/%3E%3C/svg%3E") !important;
+  mask-size: contain !important;
+  mask-repeat: no-repeat !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 11v6'/%3E%3Cpath d='M14 11v6'/%3E%3Cpath d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6'/%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/%3E%3C/svg%3E") !important;
+  -webkit-mask-size: contain !important;
+  -webkit-mask-repeat: no-repeat !important;
+}
+/* Close last — replace with X icon (Lucide) */
+.chat-sidebar .ais-Chat .ais-ChatHeader-close {
+  order: 3 !important;
+  position: relative !important;
+  width: 16px !important;
+  height: 16px !important;
+  padding: 0 !important;
+}
+.chat-sidebar .ais-Chat .ais-ChatHeader-close svg {
+  display: none !important;
+}
+.chat-sidebar .ais-Chat .ais-ChatHeader-close::after {
+  content: '' !important;
+  display: block !important;
+  width: 18px !important;
+  height: 18px !important;
+  background-color: currentColor !important;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E") !important;
+  mask-size: contain !important;
+  mask-repeat: no-repeat !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E") !important;
+  -webkit-mask-size: contain !important;
+  -webkit-mask-repeat: no-repeat !important;
+}
+
+/* --- User Messages --- */
+/* Dark bubble for user messages, rounded except bottom-right */
+.chat-sidebar .ais-ChatMessage--right .ais-ChatMessage-message {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-radius: var(--radius-card-base) var(--radius-card-base) 0 var(--radius-card-base) !important;
+}
+
+/* --- Hide copy/regenerate action buttons on messages --- */
+.chat-sidebar .ais-ChatMessage .ais-ChatMessage-actions {
+  display: none !important;
+}
+
+/* --- Prompt / Input Area --- */
+/**
+ * The input area uses a side-by-side layout: a rounded input field on the left
+ * and a rounded-square send button on the right, separated from the messages
+ * by a thin top border.
+ */
+.chat-sidebar .ais-ChatPrompt {
+  padding: 16px !important;
+  border-top: 1px solid var(--border) !important;
+  overflow: visible !important;
+}
+.chat-sidebar .ais-ChatPrompt::before {
+  display: none !important;
+}
+
+/* Input field — rounded pill with subtle gray border.
+   The body contains both the textarea and the actions (send button).
+   We use a grid layout to place them side by side, with the send button
+   appearing visually outside the input pill. */
+.chat-sidebar .ais-ChatPrompt-body {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  align-items: center !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  gap: 10px !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+/* Remove the violet focus ring from the body wrapper — focus style is on the textarea */
+.chat-sidebar .ais-ChatPrompt .ais-ChatPrompt-body:focus-within {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* The textarea gets its own rounded pill border */
+.chat-sidebar .ais-ChatPrompt textarea.ais-ChatPrompt-textarea {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-full) !important;
+  padding: 10px 18px !important;
+  min-height: unset !important;
+  max-height: 60px !important;
+  height: 42px !important;
+  font-size: 0.875rem !important;
+  background: transparent !important;
+  resize: none !important;
+}
+.chat-sidebar .ais-ChatPrompt textarea.ais-ChatPrompt-textarea:focus {
+  border-color: var(--border) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px oklch(85% 0 0) !important;
+}
+
+/* Hide the disclaimer text and prompt header */
+.chat-sidebar .ais-ChatPrompt .ais-ChatPrompt-footer {
+  display: none !important;
+}
+.chat-sidebar .ais-ChatPrompt .ais-ChatPrompt-header {
+  display: none !important;
+}
+
+/* Send button sits in the grid next to the textarea */
+.chat-sidebar .ais-ChatPrompt-body .ais-ChatPrompt-actions {
+  position: static !important;
+  padding: 0 !important;
+}
+
+/* Send button — rounded square, gray background, custom Send icon (Lucide) */
+.chat-sidebar .ais-ChatPrompt .ais-ChatPrompt-actions .ais-Button {
+  background-color: oklch(75% 0 0) !important;
+  color: white !important;
+  border-radius: 10px !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: unset !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+}
+.chat-sidebar .ais-ChatPrompt .ais-ChatPrompt-actions .ais-Button:hover {
+  background-color: oklch(55% 0 0) !important;
+}
+/* Hide the default icon and replace with Lucide Send */
+.chat-sidebar .ais-ChatPrompt .ais-ChatPrompt-actions .ais-Button svg {
+  display: none !important;
+}
+.chat-sidebar .ais-ChatPrompt .ais-ChatPrompt-actions .ais-Button::after {
+  content: '' !important;
+  display: block !important;
+  width: 18px !important;
+  height: 18px !important;
+  background-color: white !important;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z'/%3E%3Cpath d='m21.854 2.147-10.94 10.939'/%3E%3C/svg%3E") !important;
+  mask-size: contain !important;
+  mask-repeat: no-repeat !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z'/%3E%3Cpath d='m21.854 2.147-10.94 10.939'/%3E%3C/svg%3E") !important;
+  -webkit-mask-size: contain !important;
+  -webkit-mask-repeat: no-repeat !important;
+}
+
+/* --- Suggestions --- */
+/* Light muted pills with border */
+.chat-sidebar [class*="Suggestion"] button,
+.chat-sidebar .ais-ChatMessage button {
+  background: var(--muted) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-xl) !important;
+  font-size: 0.8125rem !important;
+  padding: 8px 14px !important;
+  color: var(--foreground) !important;
+}
+.chat-sidebar [class*="Suggestion"] button:hover,
+.chat-sidebar .ais-ChatMessage button:hover {
+  background: var(--border) !important;
+}
+
+/* --- Built-in Search Results Carousel --- */
+/**
+ * Hide ONLY the carousel and header elements inside tool messages.
+ * IMPORTANT: Do NOT hide the parent message — our custom displayResults
+ * layoutComponent renders inside the same parent message element.
+ */
+.chat-sidebar .ais-Carousel {
+  display: none !important;
+}
+.chat-sidebar .ais-ChatToolSearchIndexCarouselHeader {
+  display: none !important;
+}
+
+/* Add spacing between product carousels and the follow-up text.
+   Use multiple selectors to cover different DOM structures. */
+
+/* Case 1: tool message and text message are siblings inside the same content div */
+.chat-sidebar .ais-ChatMessage-tool ~ .ais-ChatMessage-message {
+  margin-top: 20px !important;
+}
+
+/* Case 2: different ChatMessage elements (subtle tool vs normal text) */
+.chat-sidebar .ais-ChatMessage--subtle + .ais-ChatMessage {
+  margin-top: 20px !important;
+}
+
+/* Case 3: display-results-root is the last child, next sibling has text */
+.chat-sidebar .display-results-root {
+  margin-bottom: 8px !important;
+}
+
+/* Case 4: broad — any text that's a direct child of content, after a tool */
+.chat-sidebar .ais-ChatMessage-content > .ais-ChatMessage-message:not(:first-child) {
+  margin-top: 20px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+
+/* The streaming-display is injected into .ais-ChatMessage-message in the correct
+   DOM order: tool → streaming-display → text span. No CSS reordering needed.
+   Just add spacing before the follow-up text span. */
+.chat-sidebar .ais-ChatMessage-message > .streaming-display + span {
+  display: block !important;
+  margin-top: 16px !important;
+  padding-top: 12px !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* --- Mobile: full-screen overlay instead of sidebar --- */
+@media (max-width: 680px) {
+  .chat-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    height: 100% !important;
+    width: 0 !important;
+  }
+  .chat-sidebar:has(.ais-Chat-container--open) {
+    width: 100% !important;
+  }
+}
+
+/* ------------------------------------------------ */
 /* Hits Widget Overrides                            */
 /* ------------------------------------------------ */
 
