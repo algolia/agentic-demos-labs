@@ -18,8 +18,8 @@ export const ecommerceConfig: VerticalConfig = {
     ],
   },
   algolia: {
-    appId: 'O5P8ZGQT18',
-    apiKey: '2a2dbb804d63ef54c51b6f7f0f476e19',
+    appId: '89ST1NWLPD',
+    apiKey: '0cf3ba61a818531808a2f0f024b6e4ca',
     indices: {
       productsIndex: 'ecommerce_ns_prod',
       querySuggestionsIndex: 'ecommerce_ns_prod_query_suggestions',
@@ -43,9 +43,9 @@ export const ecommerceConfig: VerticalConfig = {
   },
   features: {
     agentStudio: {
-      filterSuggestionsAgentID: '28a3b041-70ea-4837-9e78-d51a0fae0607',
-      shoppingAssistantAgentID: '2aea6c27-1121-4932-a93f-33fc2857a73d',
-      questionSuggestionsAgentID: '13a8ed2c-f4bf-4c13-acd0-681fd07ead9a',
+      filterSuggestionsAgentID: '55649f0f-9588-440e-9fdc-02f4fe5de308',
+      shoppingAssistantAgentID: '2aba4907-cecb-40ea-8a5a-3e872463a068',
+      questionSuggestionsAgentID: 'cf2a684e-fe2d-4ba3-878a-e9d2c8e71c54',
     },
   },
   carouselCategories: [

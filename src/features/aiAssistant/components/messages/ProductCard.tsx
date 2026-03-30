@@ -1,13 +1,16 @@
 'use client'
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useSetAtom } from 'jotai'
+import { useQuery } from '@tanstack/react-query'
+import { useAtomValue, useSetAtom } from 'jotai'
 import Link from 'next/link'
 
 import { AddToCartButton } from '@/components/ui/button/AddToCartButton'
 import { isAIAssistantExpandedState } from '@/features/aiAssistant/stores/aiAssistant'
 import type { DisplayProduct, ProductData } from '@/features/aiAssistant/types'
 import { useCart } from '@/hooks/useCart'
+import { activeConfigAtom } from '@/stores/activeConfig'
+import { searchClientAtom } from '@/stores/searchClient'
+import { buildImageUrl } from '@/utilities/getHitValues'
 
 interface ProductCardProps {
   product: DisplayProduct
@@ -15,21 +18,58 @@ interface ProductCardProps {
 
 /**
  * Product card for AI chat responses.
- * Uses Hit card style with white background image area.
+ * Fetches product data from Algolia by objectID.
  */
 export const ProductCard = ({ product }: ProductCardProps) => {
-  const queryClient = useQueryClient()
   const { addItem } = useCart()
   const setIsExpanded = useSetAtom(isAIAssistantExpandedState)
+  const searchClient = useAtomValue(searchClientAtom)
+  const config = useAtomValue(activeConfigAtom)
+
   const { data: productData } = useQuery<ProductData>({
     queryKey: ['product', product.objectID],
-    queryFn: () =>
-      queryClient.getQueryData<ProductData>(['product', product.objectID])!,
+    queryFn: async () => {
+      if (!searchClient || !config) throw new Error('Not ready')
+
+      const { indices, hitTemplate } = config.algolia
+      const result = await searchClient.search<Record<string, unknown>>([
+        {
+          indexName: indices.productsIndex,
+          params: {
+            filters: `objectID:${product.objectID}`,
+            hitsPerPage: 1,
+          },
+        },
+      ])
+
+      const hit = 'hits' in result.results[0] ? result.results[0].hits[0] : null
+      if (!hit) throw new Error('Product not found')
+
+      const imageValue = hit[hitTemplate.imageAttribute] as string | undefined
+      const image = buildImageUrl(imageValue, {
+        prefix: hitTemplate.imageHrefPrefix,
+        suffix: hitTemplate.imageHrefSuffix,
+      })
+
+      const priceValue = hitTemplate.priceAttribute
+        ? hit[hitTemplate.priceAttribute]
+        : null
+      const price = priceValue != null ? Number(priceValue) : null
+
+      const brandValue = hitTemplate.brandAttribute
+        ? hit[hitTemplate.brandAttribute]
+        : null
+
+      return {
+        objectID: hit.objectID as string,
+        name: hit[hitTemplate.nameAttribute] ? String(hit[hitTemplate.nameAttribute]) : '',
+        image,
+        price: price && !isNaN(price) ? price : null,
+        brand: brandValue ? String(brandValue) : null,
+      }
+    },
     staleTime: Infinity,
-    enabled: !!queryClient.getQueryData<ProductData>([
-      'product',
-      product.objectID,
-    ]),
+    enabled: !!searchClient && !!config,
   })
 
   if (!productData) {

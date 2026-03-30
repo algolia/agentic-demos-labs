@@ -90,9 +90,14 @@ export const useMessageState = (): MessageStateAPI => {
   const updateAssistantText = useCallback(
     (id: string, text: string) => {
       setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === id ? { ...msg, parts: [{ type: 'text', text }] } : msg,
-        ),
+        prev.map((msg) => {
+          if (msg.id !== id) return msg
+          const nonTextParts = msg.parts.filter((p) => p.type !== 'text')
+          return {
+            ...msg,
+            parts: [{ type: 'text' as const, text }, ...nonTextParts],
+          }
+        }),
       )
     },
     [setMessages],

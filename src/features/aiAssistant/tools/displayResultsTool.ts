@@ -5,11 +5,6 @@ import type {
   ToolExecutionResult,
 } from '@/features/aiAssistant/types'
 
-/**
- * Display results tool definition.
- * The actual execution is handled in useAgentChat.
- * This file defines the tool interface and any helper functions.
- */
 export const DISPLAY_RESULTS_TOOL_NAME = 'displayResults'
 
 /**
@@ -36,6 +31,7 @@ const parseDisplayResultsArgs = (
 
 /**
  * Execute displayResults tool: validates products and updates message state.
+ * The tool result is sent back to the agent by the executor.
  */
 const executeDisplayResults = async (
   data: DisplayResultsData,
