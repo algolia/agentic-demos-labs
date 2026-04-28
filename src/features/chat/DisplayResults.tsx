@@ -1,14 +1,271 @@
 'use client'
 
-/**
- * DisplayResults — Renders product groups for CHAT HISTORY only.
- *
- * This file is kept as a reference but the layoutComponent is no longer used.
- * Product rendering for new conversations is handled by StreamingDisplay.
- * This would only be needed if you re-enable the layoutComponent on the
- * displayResults tool for rendering chat history on page reload.
- */
+import { ShoppingCart } from 'lucide-react'
+import { motion } from 'motion/react'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 
-// This file is intentionally minimal — StreamingDisplay handles all rendering.
-// Kept for reference and potential future chat history support.
-export {}
+import { ecommerceConfig } from '@/app/config'
+import { useCart } from '@/hooks/useCart'
+import { getHitValues } from '@/utilities/getHitValues'
+
+import type { Tools } from 'react-instantsearch'
+
+type ToolLayoutComponent = NonNullable<Tools[string]['layoutComponent']>
+type DisplayResultsProps = Parameters<ToolLayoutComponent>[0]
+
+type AlgoliaRecord = Record<string, unknown> & { objectID: string }
+
+type PartialProduct = { objectID?: string; why?: string }
+type PartialGroup = { title?: string; why?: string; products?: PartialProduct[] }
+type DisplayResultsInput = {
+  intro?: string
+  groups?: PartialGroup[]
+}
+
+const fetchProductsByIds = async (
+  objectIDs: string[],
+): Promise<AlgoliaRecord[]> => {
+  if (objectIDs.length === 0) return []
+  const { appId, apiKey, indices } = ecommerceConfig.algolia
+  try {
+    const res = await fetch(
+      `https://${appId}-dsn.algolia.net/1/indexes/*/objects`,
+      {
+        method: 'POST',
+        headers: {
+          'X-Algolia-Application-Id': appId,
+          'X-Algolia-API-Key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requests: objectIDs.map((id) => ({
+            indexName: indices.productsIndex,
+            objectID: id,
+          })),
+        }),
+      },
+    )
+    const data = await res.json()
+    return (Array.isArray(data.results) ? data.results : []).filter(Boolean)
+  } catch {
+    return []
+  }
+}
+
+const ProductCard = ({ product }: { product: AlgoliaRecord }) => {
+  const { addItem } = useCart()
+  const values = getHitValues(product, ecommerceConfig.algolia.hitTemplate)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.2 }}>
+      <Link
+        href={`/product/${product.objectID}`}
+        className="group flex w-[160px] shrink-0 flex-col overflow-hidden rounded-card border border-border bg-card transition-shadow hover:shadow-md">
+        <div className="flex h-[140px] items-center justify-center bg-muted/30 p-3">
+          {values.image ? (
+            <img
+              src={values.image}
+              alt={values.name}
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <div className="text-xs text-muted-foreground">No image</div>
+          )}
+        </div>
+        <div className="flex flex-1 flex-col gap-0.5 p-2.5">
+          {values.brand && (
+            <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              {values.brand}
+            </p>
+          )}
+          <h4 className="text-xs font-semibold leading-tight text-foreground line-clamp-2">
+            {values.name}
+          </h4>
+          <div className="mt-auto flex items-center justify-between pt-1.5">
+            {values.price !== null && (
+              <span className="text-sm font-bold text-foreground">
+                &euro;{values.price.toFixed(2)}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                addItem({ objectID: product.objectID, ...values })
+              }}
+              className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
+              aria-label="Add to cart">
+              <ShoppingCart className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  )
+}
+
+const ProductSkeleton = () => (
+  <div className="flex w-[160px] shrink-0 flex-col overflow-hidden rounded-card border border-border bg-card">
+    <div className="flex h-[140px] items-center justify-center bg-muted/30 p-3">
+      <div className="h-full w-full animate-pulse rounded bg-muted" />
+    </div>
+    <div className="flex flex-1 flex-col gap-1.5 p-2.5">
+      <div className="h-2.5 w-16 animate-pulse rounded bg-muted" />
+      <div className="h-3 w-full animate-pulse rounded bg-muted" />
+      <div className="mt-auto flex items-center justify-between pt-1.5">
+        <div className="h-4 w-12 animate-pulse rounded bg-muted" />
+        <div className="h-7 w-7 animate-pulse rounded-full bg-muted" />
+      </div>
+    </div>
+  </div>
+)
+
+const GroupCard = ({
+  group,
+  products,
+}: {
+  group: PartialGroup
+  products: Map<string, AlgoliaRecord>
+}) => {
+  const items = group.products ?? []
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="rounded-card border border-border bg-card p-4">
+      {group.title && (
+        <h3 className="text-sm font-bold text-foreground">{group.title}</h3>
+      )}
+      {group.why && (
+        <p className="mb-3 text-xs text-muted-foreground">{group.why}</p>
+      )}
+      <div className="flex gap-3 overflow-x-auto pb-1">
+        {items.map((dp, i) => {
+          if (!dp?.objectID) {
+            return <ProductSkeleton key={`pending-${i}`} />
+          }
+          const product = products.get(dp.objectID)
+          if (!product) return <ProductSkeleton key={dp.objectID} />
+          return <ProductCard key={dp.objectID} product={product} />
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
+const collectObjectIDs = (input: DisplayResultsInput | undefined): string[] => {
+  if (!input?.groups) return []
+  const ids: string[] = []
+  for (const group of input.groups) {
+    for (const product of group?.products ?? []) {
+      if (typeof product?.objectID === 'string' && product.objectID.length > 0) {
+        ids.push(product.objectID)
+      }
+    }
+  }
+  return ids
+}
+
+export const DisplayResults = (props: DisplayResultsProps) => {
+  const { message } = props
+
+  const input = (
+    'input' in message ? (message.input as DisplayResultsInput | undefined) : undefined
+  ) ?? undefined
+  const output =
+    message.state === 'output-available'
+      ? (message.output as DisplayResultsInput | undefined)
+      : undefined
+  const data = output ?? input
+
+  const isStreaming = message.state === 'input-streaming'
+  const intro = data?.intro ?? ''
+  const groups = data?.groups ?? []
+
+  const [products, setProducts] = useState<Map<string, AlgoliaRecord>>(
+    () => new Map(),
+  )
+  const requestedIds = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    const ids = collectObjectIDs(data)
+    const newIds = ids.filter((id) => !requestedIds.current.has(id))
+    if (newIds.length === 0) return
+
+    for (const id of newIds) requestedIds.current.add(id)
+
+    let cancelled = false
+    fetchProductsByIds(newIds).then((records) => {
+      if (cancelled || records.length === 0) return
+      setProducts((prev) => {
+        const next = new Map(prev)
+        for (const record of records) {
+          if (record?.objectID) next.set(record.objectID, record)
+        }
+        return next
+      })
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [data])
+
+  if (!intro && groups.length === 0) {
+    return isStreaming ? (
+      <div className="flex items-center gap-2.5 px-2 py-2">
+        <motion.div
+          className="h-3 w-3 rounded-full bg-muted-foreground/40"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <span className="text-sm text-muted-foreground">
+          Organizing results...
+        </span>
+      </div>
+    ) : (
+      <></>
+    )
+  }
+
+  return (
+    <div className="streaming-display flex flex-col gap-3 py-2">
+      {intro && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="rounded-card border border-border bg-muted/30 p-3 text-sm text-foreground">
+          {intro}
+        </motion.div>
+      )}
+
+      {groups.map((group, i) => (
+        <GroupCard
+          key={group?.title ?? `group-${i}`}
+          group={group ?? {}}
+          products={products}
+        />
+      ))}
+
+      {isStreaming && (
+        <div className="flex items-center gap-2.5 px-2 py-2">
+          <motion.div
+            className="h-3 w-3 rounded-full bg-muted-foreground/40"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <span className="text-sm text-muted-foreground">
+            {groups.length === 0 ? 'Organizing results...' : 'Loading more...'}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}

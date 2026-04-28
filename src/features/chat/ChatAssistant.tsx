@@ -35,15 +35,14 @@
 // We layer our theme overrides on top in globals.css.
 import 'instantsearch.css/components/chat.css'
 
-import { Chat } from 'react-instantsearch'
 import { useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
-import { installSSEInterceptor } from '@/features/chat/streaming/sseInterceptor'
-import { StreamingDisplay } from '@/features/chat/StreamingDisplay'
+import { Chat } from 'react-instantsearch'
 
 import { ecommerceConfig } from '@/app/config'
 import { ChatProductCard } from '@/features/chat/ChatProductCard'
 import { ChatStepIndicator } from '@/features/chat/ChatStepIndicator'
+import { DisplayResults } from '@/features/chat/DisplayResults'
 import { isChatOpenAtom } from '@/features/chat/stores/chatPanel'
 
 import type { IndexUiState } from 'instantsearch.js'
@@ -57,14 +56,14 @@ const getSearchPageURL = (uiState: IndexUiState): string => {
 /**
  * Client-side tool implementations for Agent Studio.
  *
- * The `displayResults` tool only uses `onToolCall` to acknowledge the tool.
- * Product rendering is handled entirely by `StreamingDisplay`, which
- * listens for CustomEvents from the SSE interceptor for real-time streaming.
- *
- * No `layoutComponent` — this avoids the dual-renderer problem and flickering.
+ * `streamInput: true` opts the tool's `layoutComponent` into the
+ * `input-streaming` state, so `DisplayResults` re-renders as the model
+ * streams partial input — no SSE interception or DOM injection needed.
  */
 const tools: Tools = {
   displayResults: {
+    streamInput: true,
+    layoutComponent: DisplayResults,
     onToolCall: async ({ input, addToolResult }) => {
       addToolResult({ output: input })
     },
@@ -85,7 +84,8 @@ const useSyncChatOpenState = (containerRef: React.RefObject<HTMLElement | null>)
 
     const observer = new MutationObserver(() => {
       const chatContainer = container.querySelector('.ais-Chat-container')
-      const isOpen = chatContainer?.classList.contains('ais-Chat-container--open') ?? false
+      const isOpen =
+        chatContainer?.classList.contains('ais-Chat-container--open') ?? false
       setIsOpen(isOpen)
     })
 
@@ -104,14 +104,6 @@ export const ChatAssistant = () => {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useSyncChatOpenState(containerRef)
-
-  // Install the SSE interceptor to parse tool-input-delta events in real time.
-  // This enables progressive product rendering during streaming.
-  useEffect(() => {
-    if (!agentId) return
-    const cleanup = installSSEInterceptor()
-    return cleanup
-  }, [agentId])
 
   /**
    * Graceful degradation: if no agent ID is configured, don't render the widget.
@@ -133,20 +125,18 @@ export const ChatAssistant = () => {
       ref={containerRef}
       className="chat-sidebar"
       aria-label="AI Assistant">
-      {/* Streaming display — renders products progressively via SSE events */}
-      <StreamingDisplay />
       <Chat
         agentId={agentId}
         itemComponent={ChatProductCard}
         getSearchPageURL={getSearchPageURL}
         tools={tools}
         /**
-       * Custom loader component that shows contextual step indicators
-       * ("Thinking...", "Searching products...", "Organizing results...")
-       * instead of the default generic loading animation.
-       */
-      messagesLoaderComponent={ChatStepIndicator}
-      translations={{
+         * Custom loader component that shows contextual step indicators
+         * ("Thinking...", "Searching products...", "Organizing results...")
+         * instead of the default generic loading animation.
+         */
+        loaderComponent={ChatStepIndicator}
+        translations={{
           header: {
             title: 'AI Assistant',
           },
