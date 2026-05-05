@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { EXPERIMENTAL_Autocomplete } from 'react-instantsearch'
 import 'instantsearch.css/themes/satellite.css'
 
@@ -55,6 +56,17 @@ export const AutocompleteWidget = ({
   const pathname = usePathname()
 
   const isOnSearchPage = pathname.includes('/search')
+
+  // Close the chat sidebar on route changes triggered from the search bar so
+  // the destination page isn't loaded behind a still-open mobile overlay.
+  const previousPathname = useRef(pathname)
+  useEffect(() => {
+    if (previousPathname.current === pathname) return
+    previousPathname.current = pathname
+
+    if (!document.querySelector('.ais-Chat-container--open')) return
+    document.querySelector<HTMLButtonElement>('.ais-ChatToggleButton')?.click()
+  }, [pathname])
 
   useDetachedBackButton()
 
