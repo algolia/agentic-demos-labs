@@ -74,7 +74,6 @@ export const AutocompleteWidget = ({
     hitsPerPage,
     showProducts,
     showSuggestions,
-    showAISuggestions: false,
     showRecent,
   })
 

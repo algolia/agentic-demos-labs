@@ -12,7 +12,6 @@ interface UseAutocompleteIndicesParams {
   hitsPerPage: number
   showProducts: boolean
   showSuggestions: boolean
-  showAISuggestions: boolean
   showRecent: boolean
 }
 
