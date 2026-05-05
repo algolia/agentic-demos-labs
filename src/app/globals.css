@@ -712,6 +712,17 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
   background: var(--border) !important;
 }
 
+.chat-sidebar .ais-ChatMessage .streaming-display button[aria-label="Add to cart"] {
+  background: var(--primary) !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  padding: 0 !important;
+  color: var(--primary-foreground) !important;
+}
+.chat-sidebar .ais-ChatMessage .streaming-display button[aria-label="Add to cart"]:hover {
+  background: var(--primary) !important;
+}
+
 /* --- Built-in Search Results Carousel --- */
 /**
  * Hide ONLY the carousel and header elements inside tool messages.
@@ -778,6 +789,10 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
     width: 0 !important;
   }
   .chat-sidebar:has(.ais-Chat-container--open) {
+    width: 100% !important;
+  }
+  .chat-sidebar .ais-Chat .ais-Chat-container,
+  .chat-sidebar .ais-Chat--maximized .ais-Chat-container {
     width: 100% !important;
   }
 }

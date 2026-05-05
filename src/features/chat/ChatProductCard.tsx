@@ -43,9 +43,7 @@ export const ChatProductCard = ({ item }: ChatProductCardProps) => {
    */
   const values = getHitValues(item, ecommerceConfig.algolia.hitTemplate)
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleAddToCart = () => {
     addItem({
       objectID: item.objectID,
       ...values,
@@ -53,10 +51,12 @@ export const ChatProductCard = ({ item }: ChatProductCardProps) => {
   }
 
   return (
-    <Link
-      href={`/product/${item.objectID}`}
-      className="group flex w-[160px] shrink-0 flex-col overflow-hidden rounded-card border border-border bg-card transition-shadow hover:shadow-md">
-      {/* Product image */}
+    <div className="group relative flex w-[160px] shrink-0 flex-col overflow-hidden rounded-card border border-border bg-card transition-shadow hover:shadow-md">
+      <Link
+        href={`/product/${item.objectID}`}
+        aria-label={values.name}
+        className="absolute inset-0 z-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+      />
       <div className="flex h-[140px] items-center justify-center bg-muted/30 p-3">
         {values.image ? (
           <img
@@ -69,7 +69,6 @@ export const ChatProductCard = ({ item }: ChatProductCardProps) => {
         )}
       </div>
 
-      {/* Product details */}
       <div className="flex flex-1 flex-col gap-0.5 p-2.5">
         {values.brand && (
           <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -88,12 +87,12 @@ export const ChatProductCard = ({ item }: ChatProductCardProps) => {
           <button
             type="button"
             onClick={handleAddToCart}
-            className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
+            className="relative z-10 ml-auto flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
             aria-label="Add to cart">
             <ShoppingCart className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }

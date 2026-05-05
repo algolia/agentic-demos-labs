@@ -61,50 +61,48 @@ const ProductCard = ({ product }: { product: AlgoliaRecord }) => {
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.2 }}>
+      transition={{ duration: 0.2 }}
+      className="group relative flex w-[160px] shrink-0 flex-col overflow-hidden rounded-card border border-border bg-card transition-shadow hover:shadow-md">
       <Link
         href={`/product/${product.objectID}`}
-        className="group flex w-[160px] shrink-0 flex-col overflow-hidden rounded-card border border-border bg-card transition-shadow hover:shadow-md">
-        <div className="flex h-[140px] items-center justify-center bg-muted/30 p-3">
-          {values.image ? (
-            <img
-              src={values.image}
-              alt={values.name}
-              className="h-full w-full object-contain"
-            />
-          ) : (
-            <div className="text-xs text-muted-foreground">No image</div>
+        aria-label={values.name}
+        className="absolute inset-0 z-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
+      />
+      <div className="flex h-[140px] items-center justify-center bg-muted/30 p-3">
+        {values.image ? (
+          <img
+            src={values.image}
+            alt={values.name}
+            className="h-full w-full object-contain"
+          />
+        ) : (
+          <div className="text-xs text-muted-foreground">No image</div>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col gap-0.5 p-2.5">
+        {values.brand && (
+          <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+            {values.brand}
+          </p>
+        )}
+        <h4 className="text-xs font-semibold leading-tight text-foreground line-clamp-2">
+          {values.name}
+        </h4>
+        <div className="mt-auto flex items-center justify-between pt-1.5">
+          {values.price !== null && (
+            <span className="text-sm font-bold text-foreground">
+              &euro;{values.price.toFixed(2)}
+            </span>
           )}
+          <button
+            type="button"
+            onClick={() => addItem({ objectID: product.objectID, ...values })}
+            className="relative z-10 ml-auto flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
+            aria-label="Add to cart">
+            <ShoppingCart className="h-3.5 w-3.5" />
+          </button>
         </div>
-        <div className="flex flex-1 flex-col gap-0.5 p-2.5">
-          {values.brand && (
-            <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-              {values.brand}
-            </p>
-          )}
-          <h4 className="text-xs font-semibold leading-tight text-foreground line-clamp-2">
-            {values.name}
-          </h4>
-          <div className="mt-auto flex items-center justify-between pt-1.5">
-            {values.price !== null && (
-              <span className="text-sm font-bold text-foreground">
-                &euro;{values.price.toFixed(2)}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                addItem({ objectID: product.objectID, ...values })
-              }}
-              className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105"
-              aria-label="Add to cart">
-              <ShoppingCart className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      </Link>
+      </div>
     </motion.div>
   )
 }
@@ -191,31 +189,32 @@ export const DisplayResults = (props: DisplayResultsProps) => {
   const [products, setProducts] = useState<Map<string, AlgoliaRecord>>(
     () => new Map(),
   )
-  const requestedIds = useRef<Set<string>>(new Set())
+  const inFlightIds = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     const ids = collectObjectIDs(data)
-    const newIds = ids.filter((id) => !requestedIds.current.has(id))
-    if (newIds.length === 0) return
+    const idsToFetch = ids.filter(
+      (id) => !products.has(id) && !inFlightIds.current.has(id),
+    )
+    if (idsToFetch.length === 0) return
 
-    for (const id of newIds) requestedIds.current.add(id)
+    for (const id of idsToFetch) inFlightIds.current.add(id)
 
-    let cancelled = false
-    fetchProductsByIds(newIds).then((records) => {
-      if (cancelled || records.length === 0) return
-      setProducts((prev) => {
-        const next = new Map(prev)
-        for (const record of records) {
-          if (record?.objectID) next.set(record.objectID, record)
-        }
-        return next
+    fetchProductsByIds(idsToFetch)
+      .then((records) => {
+        if (records.length === 0) return
+        setProducts((prev) => {
+          const next = new Map(prev)
+          for (const record of records) {
+            if (record?.objectID) next.set(record.objectID, record)
+          }
+          return next
+        })
       })
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [data])
+      .finally(() => {
+        for (const id of idsToFetch) inFlightIds.current.delete(id)
+      })
+  }, [data, products])
 
   if (!intro && groups.length === 0) {
     return isStreaming ? (
