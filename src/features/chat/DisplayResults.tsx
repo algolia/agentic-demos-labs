@@ -265,11 +265,7 @@ export const DisplayResults = (props: DisplayResultsProps) => {
       )}
 
       {groups.map((group, i) => (
-        <GroupCard
-          key={group?.title ?? `group-${i}`}
-          group={group ?? {}}
-          products={products}
-        />
+        <GroupCard key={`group-${i}`} group={group ?? {}} products={products} />
       ))}
 
       {isStreaming && (
