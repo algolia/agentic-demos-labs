@@ -18,8 +18,8 @@ export const ecommerceConfig: VerticalConfig = {
     ],
   },
   algolia: {
-    appId: 'O5P8ZGQT18',
-    apiKey: '2a2dbb804d63ef54c51b6f7f0f476e19',
+    appId: '89ST1NWLPD',
+    apiKey: '0cf3ba61a818531808a2f0f024b6e4ca',
     indices: {
       productsIndex: 'ecommerce_ns_prod',
       querySuggestionsIndex: 'ecommerce_ns_prod_query_suggestions',
@@ -43,9 +43,17 @@ export const ecommerceConfig: VerticalConfig = {
   },
   features: {
     agentStudio: {
-      filterSuggestionsAgentID: '28a3b041-70ea-4837-9e78-d51a0fae0607',
-      shoppingAssistantAgentID: '2aea6c27-1121-4932-a93f-33fc2857a73d',
-      questionSuggestionsAgentID: '13a8ed2c-f4bf-4c13-acd0-681fd07ead9a',
+      /**
+       * Agent Studio agent IDs — find these in the Algolia dashboard:
+       * Generative AI > Agent Studio > Agents > [Your Agent] > Settings
+       *
+       * When shoppingAssistantAgentID is set, the app renders an "AI mode"
+       * button in the autocomplete search bar that opens the chat panel.
+       * Leave empty to disable AI features.
+       *
+       * To create your agent, follow the guide in docs/agent-setup.md.
+       */
+      shoppingAssistantAgentID: '2aba4907-cecb-40ea-8a5a-3e872463a068',
     },
   },
   carouselCategories: [

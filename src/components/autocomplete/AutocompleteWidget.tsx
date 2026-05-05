@@ -1,7 +1,7 @@
 'use client'
 
-import { useSetAtom } from 'jotai'
 import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { EXPERIMENTAL_Autocomplete } from 'react-instantsearch'
 import 'instantsearch.css/themes/satellite.css'
 
@@ -10,7 +10,6 @@ import {
   useAutocompleteIndices,
   useDetachedBackButton,
 } from '@/components/autocomplete/hooks'
-import { isAIAssistantOpenState } from '@/features/aiAssistant'
 
 import type { ReactNode } from 'react'
 
@@ -19,9 +18,7 @@ interface AutocompletePanelProps {
   showRecent: boolean
   showSuggestions: boolean
   showProducts: boolean
-  showAISuggestions: boolean
   indexName?: string
-  aiSuggestionsIndexName?: string
 }
 
 const AutocompletePanel = ({
@@ -29,17 +26,12 @@ const AutocompletePanel = ({
   showRecent,
   showSuggestions,
   showProducts,
-  showAISuggestions,
   indexName,
-  aiSuggestionsIndexName,
 }: AutocompletePanelProps) => (
   <>
     {showRecent && elements.recent}
     {showSuggestions && elements.suggestions}
     {showProducts && indexName && elements[indexName]}
-    {showAISuggestions &&
-      aiSuggestionsIndexName &&
-      elements[aiSuggestionsIndexName]}
   </>
 )
 
@@ -49,8 +41,6 @@ interface AutocompleteWidgetProps {
   showProducts?: boolean
   showSuggestions?: boolean
   showRecent?: boolean
-  showAISuggestions?: boolean
-  showAIButton?: boolean
   hitsPerPage?: number
 }
 
@@ -60,31 +50,42 @@ export const AutocompleteWidget = ({
   showProducts = true,
   showSuggestions = false,
   showRecent = false,
-  showAISuggestions = false,
-  showAIButton = false,
   hitsPerPage = 3,
 }: AutocompleteWidgetProps) => {
   const router = useRouter()
   const pathname = usePathname()
-  const setIsAIAssistantOpen = useSetAtom(isAIAssistantOpenState)
 
   const isOnSearchPage = pathname.includes('/search')
 
-  useAIButtonInjection({ enabled: showAIButton, basePath })
+  // Close the chat sidebar on route changes triggered from the search bar so
+  // the destination page isn't loaded behind a still-open mobile overlay.
+  const previousPathname = useRef(pathname)
+  useEffect(() => {
+    if (previousPathname.current === pathname) return
+    previousPathname.current = pathname
+
+    if (!document.querySelector('.ais-Chat-container--open')) return
+    document.querySelector<HTMLButtonElement>('.ais-ChatToggleButton')?.click()
+  }, [pathname])
+
   useDetachedBackButton()
+
+  // Injects an "AI mode" button into the search bar that opens the Chat panel.
+  // Only renders when a valid Agent Studio agent ID is configured in config.ts.
+  // Pass `isOnSearchPage` so the button is re-injected when the underlying
+  // autocomplete is remounted via its `key` on route transitions.
+  useAIButtonInjection(isOnSearchPage)
 
   const {
     indices,
     suggestionsConfig,
     recentConfig,
     productsIndexName,
-    aiSuggestionsIndexName,
   } = useAutocompleteIndices({
     basePath,
     hitsPerPage,
     showProducts,
     showSuggestions,
-    showAISuggestions,
     showRecent,
   })
 
@@ -93,12 +94,8 @@ export const AutocompleteWidget = ({
 
     const item = params.item
 
-    // AI suggestions handle their own navigation
-    if (item.__indexName === aiSuggestionsIndexName) return
-
     // Recent search or suggestion
     if ('query' in item && item.query) {
-      setIsAIAssistantOpen(false)
       router.push(
         `${basePath}/search?query=${encodeURIComponent(String(item.query))}`,
       )
@@ -107,7 +104,6 @@ export const AutocompleteWidget = ({
 
     // Product
     if (item.objectID) {
-      setIsAIAssistantOpen(false)
       router.push(`${basePath}/product/${item.objectID}`)
     }
   }
@@ -153,9 +149,7 @@ export const AutocompleteWidget = ({
             showRecent={showRecent}
             showSuggestions={showSuggestions}
             showProducts={showProducts}
-            showAISuggestions={showAISuggestions}
             indexName={productsIndexName}
-            aiSuggestionsIndexName={aiSuggestionsIndexName}
           />
         </div>
       )}

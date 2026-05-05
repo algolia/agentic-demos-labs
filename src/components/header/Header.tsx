@@ -24,7 +24,7 @@ interface VariantClasses {
 
 const VARIANT_CLASSES: Record<Variant, VariantClasses> = {
   standard: {
-    header: 'bg-background border-b border-border',
+    header: 'sticky top-0 z-50 bg-background border-b border-border',
     container: 'container mx-auto px-6 py-3',
     innerWrapper: 'flex items-center lg:gap-8',
     leftSection: 'flex items-center flex-1 lg:flex-none shrink-0',

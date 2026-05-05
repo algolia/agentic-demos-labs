@@ -42,6 +42,9 @@ next-env.d.ts
 .claude/
 CLAUDE.md
 
+# playwright
+.playwright-mcp/
+
 # documentation
 UI_IMPLEMENTATION_PLAN.md
 UI_IMPLEMENTATION_PLAN_PHASE2.md

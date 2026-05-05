@@ -6,7 +6,6 @@ import { useEffect } from 'react'
 
 import { DeliveryTracker } from '@/app/order/[id]/_components/DeliveryTracker'
 import { OrderItemsSummary } from '@/app/order/[id]/_components/OrderItemsSummary'
-import { PostPurchaseAI } from '@/app/order/[id]/_components/PostPurchaseAI'
 import { SuccessCheckmark } from '@/app/order/[id]/_components/SuccessCheckmark'
 import { useActiveConfig } from '@/hooks/useActiveConfig'
 import { useCart } from '@/hooks/useCart'
@@ -48,18 +47,9 @@ const OrderConfirmationPage = () => {
         </p>
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {/* Left Column: Delivery + Items */}
-        <div className="space-y-6">
-          <DeliveryTracker />
-          <OrderItemsSummary order={order} />
-        </div>
-
-        {/* Right Column: AI Section */}
-        <div>
-          <PostPurchaseAI order={order} basePath="" />
-        </div>
+      <div className="space-y-6">
+        <DeliveryTracker />
+        <OrderItemsSummary order={order} />
       </div>
     </div>
   )

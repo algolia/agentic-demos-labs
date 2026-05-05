@@ -7,7 +7,7 @@ import { Footer } from '@/components/footer/Footer'
 import { Header } from '@/components/header/Header'
 import { Providers } from '@/components/providers/Providers'
 import { CartBadge } from '@/components/ui/CartBadge'
-import { AIAssistantLayout } from '@/features/aiAssistant'
+import { ChatAssistant } from '@/features/chat/ChatAssistant'
 
 import type { Metadata } from 'next'
 
@@ -18,6 +18,26 @@ export const metadata: Metadata = {
   },
 }
 
+/**
+ * Root Layout — The main layout structure with an optional AI sidebar.
+ *
+ * The layout uses a two-column flex structure:
+ *   ┌──────────────────────┬──────────────┐
+ *   │       Header         │              │
+ *   ├──────────────────────┤  AI Assistant │
+ *   │    Main Content      │   Sidebar    │
+ *   ├──────────────────────┤   (400px)    │
+ *   │       Footer         │              │
+ *   └──────────────────────┴──────────────┘
+ *
+ * When the AI sidebar is closed, the main content takes the full width.
+ * When opened, the sidebar slides in from the right and the main content
+ * shrinks to make room — no overlay, no content hiding.
+ *
+ * The sidebar is rendered via the `<ChatAssistant>` component which embeds
+ * the Agent Studio Chat widget. The sidebar width is controlled by the
+ * `--assistant-panel-width` CSS variable (400px).
+ */
 const RootLayout = ({
   children,
 }: Readonly<{
@@ -35,8 +55,6 @@ const RootLayout = ({
               basePath=""
               placeholder="What are you looking for today?"
               showSuggestions
-              showAISuggestions
-              showAIButton
             />
           </Header.CenterSection>
           <Header.RightSection>
@@ -49,10 +67,21 @@ const RootLayout = ({
             <CartBadge href="/cart" />
           </Header.RightSection>
         </Header>
-        <main className="flex-1">
-          <AIAssistantLayout basePath="">{children}</AIAssistantLayout>
-        </main>
-        <Footer variant="standard" name={config.name} />
+
+        {/*
+          Two-column layout: main content + optional AI sidebar.
+          The sidebar is part of the document flow, not a fixed overlay.
+          When opened, it pushes the main content to the left.
+        */}
+        <div className="flex flex-1">
+          <div className="flex min-w-0 flex-1 flex-col">
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer variant="standard" name={config.name} />
+          </div>
+          <ChatAssistant />
+        </div>
       </Providers>
     </body>
   </html>
