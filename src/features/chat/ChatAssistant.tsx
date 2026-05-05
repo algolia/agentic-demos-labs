@@ -50,7 +50,7 @@ import type { Tools } from 'react-instantsearch'
 
 const getSearchPageURL = (uiState: IndexUiState): string => {
   const query = uiState.query || ''
-  return `/search?q=${encodeURIComponent(query)}`
+  return `/search?query=${encodeURIComponent(query)}`
 }
 
 /**
