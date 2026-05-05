@@ -47,15 +47,13 @@ export const ecommerceConfig: VerticalConfig = {
        * Agent Studio agent IDs — find these in the Algolia dashboard:
        * Generative AI > Agent Studio > Agents > [Your Agent] > Settings
        *
-       * When shoppingAssistantAgentID is set, the app renders a floating chat
-       * toggle button and an "AI mode" button in the search bar.
+       * When shoppingAssistantAgentID is set, the app renders an "AI mode"
+       * button in the autocomplete search bar that opens the chat panel.
        * Leave empty to disable AI features.
        *
-       * To create your agents, follow the guide in docs/agent-setup.md.
+       * To create your agent, follow the guide in docs/agent-setup.md.
        */
       shoppingAssistantAgentID: '2aba4907-cecb-40ea-8a5a-3e872463a068',
-      filterSuggestionsAgentID: '55649f0f-9588-440e-9fdc-02f4fe5de308',
-      questionSuggestionsAgentID: 'cf2a684e-fe2d-4ba3-878a-e9d2c8e71c54',
     },
   },
   carouselCategories: [
