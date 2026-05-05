@@ -28,29 +28,28 @@ const fetchProductsByIds = async (
 ): Promise<AlgoliaRecord[]> => {
   if (objectIDs.length === 0) return []
   const { appId, apiKey, indices } = ecommerceConfig.algolia
-  try {
-    const res = await fetch(
-      `https://${appId}-dsn.algolia.net/1/indexes/*/objects`,
-      {
-        method: 'POST',
-        headers: {
-          'X-Algolia-Application-Id': appId,
-          'X-Algolia-API-Key': apiKey,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          requests: objectIDs.map((id) => ({
-            indexName: indices.productsIndex,
-            objectID: id,
-          })),
-        }),
+  const res = await fetch(
+    `https://${appId}-dsn.algolia.net/1/indexes/*/objects`,
+    {
+      method: 'POST',
+      headers: {
+        'X-Algolia-Application-Id': appId,
+        'X-Algolia-API-Key': apiKey,
+        'Content-Type': 'application/json',
       },
-    )
-    const data = await res.json()
-    return (Array.isArray(data.results) ? data.results : []).filter(Boolean)
-  } catch {
-    return []
+      body: JSON.stringify({
+        requests: objectIDs.map((id) => ({
+          indexName: indices.productsIndex,
+          objectID: id,
+        })),
+      }),
+    },
+  )
+  if (!res.ok) {
+    throw new Error(`Failed to fetch products: ${res.status}`)
   }
+  const data = await res.json()
+  return (Array.isArray(data.results) ? data.results : []).filter(Boolean)
 }
 
 const ProductCard = ({ product }: { product: AlgoliaRecord }) => {
@@ -189,7 +188,9 @@ export const DisplayResults = (props: DisplayResultsProps) => {
   const [products, setProducts] = useState<Map<string, AlgoliaRecord>>(
     () => new Map(),
   )
+  const [retryNonce, setRetryNonce] = useState(0)
   const inFlightIds = useRef<Set<string>>(new Set())
+  const retryAttempts = useRef(0)
 
   useEffect(() => {
     const ids = Array.from(new Set(collectObjectIDs(data)))
@@ -200,8 +201,11 @@ export const DisplayResults = (props: DisplayResultsProps) => {
 
     for (const id of idsToFetch) inFlightIds.current.add(id)
 
+    let cancelled = false
     fetchProductsByIds(idsToFetch)
       .then((records) => {
+        if (cancelled) return
+        retryAttempts.current = 0
         if (records.length === 0) return
         setProducts((prev) => {
           const next = new Map(prev)
@@ -211,10 +215,25 @@ export const DisplayResults = (props: DisplayResultsProps) => {
           return next
         })
       })
+      .catch(() => {
+        if (cancelled) return
+        // Schedule a bounded retry with exponential backoff so a transient
+        // network/API failure doesn't permanently leave cards as skeletons.
+        if (retryAttempts.current >= 3) return
+        const delay = 1000 * 2 ** retryAttempts.current
+        retryAttempts.current += 1
+        setTimeout(() => {
+          if (!cancelled) setRetryNonce((n) => n + 1)
+        }, delay)
+      })
       .finally(() => {
         for (const id of idsToFetch) inFlightIds.current.delete(id)
       })
-  }, [data, products])
+
+    return () => {
+      cancelled = true
+    }
+  }, [data, products, retryNonce])
 
   if (!intro && groups.length === 0) {
     return isStreaming ? (
