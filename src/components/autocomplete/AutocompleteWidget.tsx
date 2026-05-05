@@ -60,7 +60,9 @@ export const AutocompleteWidget = ({
 
   // Injects an "AI mode" button into the search bar that opens the Chat panel.
   // Only renders when a valid Agent Studio agent ID is configured in config.ts.
-  useAIButtonInjection()
+  // Pass `isOnSearchPage` so the button is re-injected when the underlying
+  // autocomplete is remounted via its `key` on route transitions.
+  useAIButtonInjection(isOnSearchPage)
 
   const {
     indices,
