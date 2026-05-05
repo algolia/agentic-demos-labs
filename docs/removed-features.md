@@ -198,7 +198,7 @@ The removed system was a complete AI shopping assistant built with Algolia Agent
 ### ProductGroup (`ProductGroup.tsx`)
 - Horizontal scrollable carousel of ProductCards
 - Showed group title and "why" explanation
-- Limited to `MAX_VISIBLE_PRODUCTS` (6) per group
+- Limited to `MAX_VISIBLE_PRODUCTS` (4) per group
 - Animated entrance with Framer Motion
 
 ---
