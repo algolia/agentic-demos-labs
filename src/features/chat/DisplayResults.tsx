@@ -192,7 +192,7 @@ export const DisplayResults = (props: DisplayResultsProps) => {
   const inFlightIds = useRef<Set<string>>(new Set())
 
   useEffect(() => {
-    const ids = collectObjectIDs(data)
+    const ids = Array.from(new Set(collectObjectIDs(data)))
     const idsToFetch = ids.filter(
       (id) => !products.has(id) && !inFlightIds.current.has(id),
     )
