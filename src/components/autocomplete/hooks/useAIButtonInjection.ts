@@ -68,13 +68,14 @@ export const useAIButtonInjection = (resetKey?: unknown) => {
       button.innerHTML = `${SPARKLES_SVG}<span>AI mode</span>`
 
       /**
-       * On click, we open the Chat widget by programmatically clicking its
-       * built-in toggle button. This is the simplest way to trigger the panel
-       * since the Chat widget manages its own open/close state internally.
+       * Open the Chat widget by clicking its built-in toggle. Skip the click
+       * when the panel is already open so this button stays idempotent.
        */
       button.addEventListener('click', (e) => {
         e.preventDefault()
         e.stopPropagation()
+
+        if (document.querySelector('.ais-Chat-container--open')) return
 
         const toggleButton = document.querySelector<HTMLButtonElement>(
           '.ais-ChatToggleButton',
