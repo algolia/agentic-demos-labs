@@ -271,7 +271,6 @@
 .ais-Autocomplete .ais-AutocompleteForm,
 .ais-AutocompleteDetachedOverlay .ais-AutocompleteForm {
   position: relative;
-  z-index: 1; /* Creates stacking context so AI button z-index is scoped to form */
   background-color: var(--color-muted);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
@@ -280,79 +279,6 @@
   transition: all 200ms ease;
 }
 
-/* AI Mode Button inside SearchBox */
-.ais-Autocomplete .aa-AIButton,
-.ais-AutocompleteForm .aa-AIButton,
-button.aa-AIButton[type='button'] {
-  /* Reset button defaults without using all:unset */
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-  position: absolute !important;
-  right: 8px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  z-index: 10 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  padding: 6px 12px !important;
-  font-family: inherit !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  line-height: 1 !important;
-  color: var(--foreground, #000) !important;
-  background: transparent !important;
-  border-style: solid !important;
-  border-width: 1px !important;
-  border-color: var(--accent, #6366f1) !important;
-  border-radius: calc(var(--radius-xl, 1rem) - 8px) !important;
-  cursor: pointer !important;
-  transition: all 200ms ease !important;
-}
-
-.ais-Autocomplete .aa-AIButton:hover,
-.ais-AutocompleteForm .aa-AIButton:hover,
-button.aa-AIButton[type='button']:hover {
-  background: var(--accent, #6366f1) !important;
-  color: #fff !important;
-  border-color: var(--accent, #6366f1) !important;
-  transform: translateY(-50%) scale(0.98) !important;
-}
-
-.ais-Autocomplete .aa-AIButton svg,
-.ais-AutocompleteForm .aa-AIButton svg,
-button.aa-AIButton[type='button'] svg {
-  width: 14px !important;
-  height: 14px !important;
-  flex-shrink: 0 !important;
-  color: var(--accent, #6366f1) !important;
-  stroke: var(--accent, #6366f1) !important;
-  transition: all 200ms ease !important;
-}
-
-.ais-Autocomplete .aa-AIButton:hover svg,
-.ais-AutocompleteForm .aa-AIButton:hover svg,
-button.aa-AIButton[type='button']:hover svg {
-  color: #fff !important;
-  stroke: #fff !important;
-}
-
-.ais-Autocomplete .aa-AIButton span,
-.ais-AutocompleteForm .aa-AIButton span,
-button.aa-AIButton[type='button'] span {
-  white-space: nowrap !important;
-}
-
-/* Disabled state */
-.ais-Autocomplete .aa-AIButton--disabled,
-.ais-AutocompleteForm .aa-AIButton--disabled,
-button.aa-AIButton[type='button'].aa-AIButton--disabled {
-  opacity: 0.4 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-}
 
 .ais-AutocompleteInput {
   padding-right: 0.5rem !important;
@@ -380,9 +306,36 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
   box-shadow: none !important;
 }
 
-/* Detached cancel button - hidden, replaced by back arrow on submit button */
+/* Detached cancel button — styled as a back arrow */
 .ais-AutocompleteDetachedCancelButton {
+  background: transparent !important;
+  border: none !important;
+  padding: 8px !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--color-foreground) !important;
+  cursor: pointer !important;
+  font-size: 0 !important;
+  flex-shrink: 0 !important;
+}
+.ais-AutocompleteDetachedCancelButton svg {
   display: none !important;
+}
+.ais-AutocompleteDetachedCancelButton::before {
+  content: '' !important;
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+  background-color: var(--color-foreground) !important;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5'/%3E%3Cpath d='m12 19-7-7 7-7'/%3E%3C/svg%3E") !important;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5'/%3E%3Cpath d='m12 19-7-7 7-7'/%3E%3C/svg%3E") !important;
+  mask-size: contain !important;
+  -webkit-mask-size: contain !important;
+  mask-repeat: no-repeat !important;
+  -webkit-mask-repeat: no-repeat !important;
 }
 
 /* Input focus state */
@@ -531,17 +484,6 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
   width: var(--assistant-panel-maximized-width) !important;
 }
 
-/* Hide the floating toggle button visually — we use the "AI mode" button in the
-   search bar instead. We use size/opacity/pointer-events instead of display:none
-   so the button remains clickable programmatically by useAIButtonInjection. */
-.chat-sidebar .ais-Chat .ais-Chat-toggleButtonWrapper {
-  width: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  position: absolute !important;
-}
 
 /* --- Header --- */
 /* Clean header with a subtle bottom border, no gradient fade, no sparkle icon */
@@ -712,70 +654,6 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
   background: var(--border) !important;
 }
 
-.chat-sidebar .ais-ChatMessage .streaming-display button[aria-label="Add to cart"] {
-  background: var(--primary) !important;
-  border: none !important;
-  border-radius: 9999px !important;
-  padding: 0 !important;
-  color: var(--primary-foreground) !important;
-}
-.chat-sidebar .ais-ChatMessage .streaming-display button[aria-label="Add to cart"]:hover {
-  background: var(--primary) !important;
-}
-
-/* --- Built-in Search Results Carousel --- */
-/**
- * Hide ONLY the carousel and header elements inside tool messages.
- * IMPORTANT: Do NOT hide the parent message — our custom displayResults
- * layoutComponent renders inside the same parent message element.
- */
-.chat-sidebar .ais-Carousel {
-  display: none !important;
-}
-.chat-sidebar .ais-ChatToolSearchIndexCarouselHeader {
-  display: none !important;
-}
-
-/* Add spacing between product carousels and the follow-up text.
-   Use multiple selectors to cover different DOM structures. */
-
-/* Case 1: tool message and text message are siblings inside the same content div */
-.chat-sidebar .ais-ChatMessage-tool ~ .ais-ChatMessage-message {
-  margin-top: 20px !important;
-}
-
-/* Case 2: different ChatMessage elements (subtle tool vs normal text) */
-.chat-sidebar .ais-ChatMessage--subtle + .ais-ChatMessage {
-  margin-top: 20px !important;
-}
-
-/* Case 3: display-results-root is the last child, next sibling has text */
-.chat-sidebar .display-results-root {
-  margin-bottom: 8px !important;
-}
-
-/* Case 4: broad — any text that's a direct child of content, after a tool */
-.chat-sidebar .ais-ChatMessage-content > .ais-ChatMessage-message:not(:first-child) {
-  margin-top: 20px !important;
-  padding-top: 16px !important;
-  border-top: 1px solid var(--border) !important;
-}
-
-
-/* The streaming-display is injected into .ais-ChatMessage-message in the correct
-   DOM order: tool → streaming-display → text span. No CSS reordering needed.
-   Just add spacing before the follow-up text span. */
-.chat-sidebar .ais-ChatMessage-message > .streaming-display + span {
-  display: block !important;
-  margin-top: 16px !important;
-  padding-top: 12px !important;
-  border-top: 1px solid var(--border) !important;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.2); }
-}
 
 /* --- Mobile: overlay sitting below the sticky page header --- */
 /* The page header (Header.tsx) is sticky at z-50. We anchor the chat below it

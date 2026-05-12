@@ -53,7 +53,7 @@ export const ecommerceConfig: VerticalConfig = {
        *
        * To create your agent, follow the guide in docs/agent-setup.md.
        */
-      shoppingAssistantAgentID: '2aba4907-cecb-40ea-8a5a-3e872463a068',
+      shoppingAssistantAgentID: '89eec0e7-4adc-4f99-bfe9-fb78b5161e0c',
     },
   },
   carouselCategories: [

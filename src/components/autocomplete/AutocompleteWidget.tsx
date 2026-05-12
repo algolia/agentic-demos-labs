@@ -6,9 +6,7 @@ import { EXPERIMENTAL_Autocomplete } from 'react-instantsearch'
 import 'instantsearch.css/themes/satellite.css'
 
 import {
-  useAIButtonInjection,
   useAutocompleteIndices,
-  useDetachedBackButton,
 } from '@/components/autocomplete/hooks'
 
 import type { ReactNode } from 'react'
@@ -67,14 +65,6 @@ export const AutocompleteWidget = ({
     if (!document.querySelector('.ais-Chat-container--open')) return
     document.querySelector<HTMLButtonElement>('.ais-ChatToggleButton')?.click()
   }, [pathname])
-
-  useDetachedBackButton()
-
-  // Injects an "AI mode" button into the search bar that opens the Chat panel.
-  // Only renders when a valid Agent Studio agent ID is configured in config.ts.
-  // Pass `isOnSearchPage` so the button is re-injected when the underlying
-  // autocomplete is remounted via its `key` on route transitions.
-  useAIButtonInjection(isOnSearchPage)
 
   const {
     indices,
@@ -135,9 +125,10 @@ export const AutocompleteWidget = ({
       key={isOnSearchPage ? 'search' : 'non-search'}
       placeholder={placeholder}
       detachedMediaQuery="(max-width: 1024px)"
+      aiMode
       onClick={handleClick}
       indices={indices}
-      showSuggestions={suggestionsConfig}
+      showQuerySuggestions={suggestionsConfig}
       showRecent={recentConfig}
       searchParameters={{ hitsPerPage }}
       onSelect={handleSelect}
