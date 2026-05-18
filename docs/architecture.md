@@ -43,17 +43,16 @@ This document explains how the AI assistant is wired together, from the search b
 
 **Files:**
 - `src/components/autocomplete/AutocompleteWidget.tsx` — renders the search bar using `EXPERIMENTAL_Autocomplete` from `react-instantsearch`
-- `src/components/autocomplete/hooks/useAIButtonInjection.ts` — injects the "AI mode" button into the search form
 
 **How it works:**
 
-The `AutocompleteWidget` accepts a `showAIButton` prop. When enabled, the `useAIButtonInjection` hook uses a `MutationObserver` to inject a button element into the autocomplete form. When clicked, the button:
+`AutocompleteWidget` passes the `aiMode={true}` prop to `EXPERIMENTAL_Autocomplete` whenever a `shoppingAssistantAgentID` is configured. The widget then renders a built-in "AI Mode" button (`.ais-AiModeButton`) inside the search input. When clicked, the autocomplete:
 
-1. Reads the current query from the search input
-2. Blurs the input (to close the autocomplete dropdown)
-3. Sets `initialAIMessageState` (a Jotai atom) with the query text
-4. Sets `isAIAssistantOpenState` to `true`
-5. On the homepage, also sets `isAIAssistantExpandedState` to `true` (fullscreen mode)
+1. Closes the suggestions dropdown
+2. Calls `setOpen(true)` on the `<Chat>` widget via the shared `<InstantSearch>` render state
+3. If there is text in the search input, calls `sendMessage({ text: query })` so the chat starts with the user's question
+
+No DOM injection, polling, or custom Jotai wiring is needed — the autocomplete and chat coordinate through the same InstantSearch index.
 
 ### 2. AI Assistant Layout
 

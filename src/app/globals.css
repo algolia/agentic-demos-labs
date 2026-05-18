@@ -267,91 +267,87 @@
   color: var(--color-primary) !important;
 }
 
-/* Input border and radius - consistent with buttons/cards */
+/* Input border and radius - consistent with buttons/cards.
+   Padding-right reserves space for the built-in AI Mode button + clear button
+   so the placeholder/text never sit underneath them. */
 .ais-Autocomplete .ais-AutocompleteForm,
 .ais-AutocompleteDetachedOverlay .ais-AutocompleteForm {
   position: relative;
-  z-index: 1; /* Creates stacking context so AI button z-index is scoped to form */
   background-color: var(--color-muted);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   height: 44px;
-  padding: 0 110px 0 0;
+  padding: 0 8px 0 0;
   transition: all 200ms ease;
 }
 
-/* AI Mode Button inside SearchBox */
-.ais-Autocomplete .aa-AIButton,
-.ais-AutocompleteForm .aa-AIButton,
-button.aa-AIButton[type='button'] {
-  /* Reset button defaults without using all:unset */
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-  position: absolute !important;
-  right: 8px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  z-index: 10 !important;
+/* The suffix wrapper holds the clear button + AI mode button. We turn it into
+   a flex row so they sit nicely beside each other on the right side. */
+.ais-Autocomplete .ais-AutocompleteInputWrapperSuffix,
+.ais-AutocompleteDetachedOverlay .ais-AutocompleteInputWrapperSuffix {
   display: flex !important;
   align-items: center !important;
   gap: 6px !important;
-  padding: 6px 12px !important;
+  padding-right: 4px !important;
+}
+
+/* AI Mode Button — built-in widget button styled to match the app theme.
+   Renders inside `.ais-AutocompleteInputWrapperSuffix` when `aiMode` is true. */
+.ais-AiModeButton {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  margin: 0 !important;
   font-family: inherit !important;
-  font-size: 0.875rem !important;
+  font-size: 0.8125rem !important;
   font-weight: 500 !important;
   line-height: 1 !important;
-  color: var(--foreground, #000) !important;
+  color: var(--accent) !important;
   background: transparent !important;
-  border-style: solid !important;
-  border-width: 1px !important;
-  border-color: var(--accent, #6366f1) !important;
-  border-radius: calc(var(--radius-xl, 1rem) - 8px) !important;
+  border: 1px solid var(--accent) !important;
+  border-radius: 9999px !important;
   cursor: pointer !important;
-  transition: all 200ms ease !important;
+  white-space: nowrap !important;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease !important;
 }
 
-.ais-Autocomplete .aa-AIButton:hover,
-.ais-AutocompleteForm .aa-AIButton:hover,
-button.aa-AIButton[type='button']:hover {
-  background: var(--accent, #6366f1) !important;
-  color: #fff !important;
-  border-color: var(--accent, #6366f1) !important;
-  transform: translateY(-50%) scale(0.98) !important;
+.ais-AiModeButton:hover {
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+  transform: scale(0.98) !important;
 }
 
-.ais-Autocomplete .aa-AIButton svg,
-.ais-AutocompleteForm .aa-AIButton svg,
-button.aa-AIButton[type='button'] svg {
+.ais-AiModeButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 40%, transparent) !important;
+  outline-offset: 2px !important;
+}
+
+.ais-AiModeButton-icon {
   width: 14px !important;
   height: 14px !important;
   flex-shrink: 0 !important;
-  color: var(--accent, #6366f1) !important;
-  stroke: var(--accent, #6366f1) !important;
-  transition: all 200ms ease !important;
+  color: currentColor !important;
 }
 
-.ais-Autocomplete .aa-AIButton:hover svg,
-.ais-AutocompleteForm .aa-AIButton:hover svg,
-button.aa-AIButton[type='button']:hover svg {
-  color: #fff !important;
-  stroke: #fff !important;
-}
-
-.ais-Autocomplete .aa-AIButton span,
-.ais-AutocompleteForm .aa-AIButton span,
-button.aa-AIButton[type='button'] span {
+.ais-AiModeButton-label {
   white-space: nowrap !important;
 }
 
-/* Disabled state */
-.ais-Autocomplete .aa-AIButton--disabled,
-.ais-AutocompleteForm .aa-AIButton--disabled,
-button.aa-AIButton[type='button'].aa-AIButton--disabled {
-  opacity: 0.4 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
+/* On very small screens, hide the label and show only the sparkle icon
+   so the button still fits next to the input on narrow viewports. */
+@media (max-width: 420px) {
+  .ais-AiModeButton {
+    padding: 0 8px !important;
+  }
+  .ais-AiModeButton-label {
+    display: none !important;
+  }
 }
 
 .ais-AutocompleteInput {
@@ -531,9 +527,11 @@ button.aa-AIButton[type='button'].aa-AIButton--disabled {
   width: var(--assistant-panel-maximized-width) !important;
 }
 
-/* Hide the floating toggle button visually — we use the "AI mode" button in the
-   search bar instead. We use size/opacity/pointer-events instead of display:none
-   so the button remains clickable programmatically by useAIButtonInjection. */
+/* Hide the floating chat toggle button — we use the built-in "AI Mode" button
+   in the search bar (via EXPERIMENTAL_Autocomplete's `aiMode` prop) instead.
+   We collapse the button visually but keep it in the DOM so the route-change
+   effect in AutocompleteWidget can still click it to close the chat on
+   navigation. */
 .chat-sidebar .ais-Chat .ais-Chat-toggleButtonWrapper {
   width: 0 !important;
   height: 0 !important;

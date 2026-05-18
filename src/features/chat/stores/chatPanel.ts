@@ -9,7 +9,10 @@
  * This atom is used by:
  * - `ChatAssistant` — to sync the widget's open state
  * - `layout.tsx` (via `ChatLayout`) — to add/remove the sidebar column
- * - `useAIButtonInjection` — to toggle the panel from the search bar
+ *
+ * The actual toggle is wired through `EXPERIMENTAL_Autocomplete`'s built-in
+ * `aiMode` prop, which talks to the Chat widget directly via the shared
+ * `<InstantSearch>` render state.
  */
 
 import { atom } from 'jotai'
