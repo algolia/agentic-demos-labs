@@ -5,8 +5,8 @@ import { useEffect, useRef } from 'react'
 import { EXPERIMENTAL_Autocomplete } from 'react-instantsearch'
 import 'instantsearch.css/themes/satellite.css'
 
+import { ecommerceConfig } from '@/app/config'
 import {
-  useAIButtonInjection,
   useAutocompleteIndices,
   useDetachedBackButton,
 } from '@/components/autocomplete/hooks'
@@ -70,11 +70,15 @@ export const AutocompleteWidget = ({
 
   useDetachedBackButton()
 
-  // Injects an "AI mode" button into the search bar that opens the Chat panel.
-  // Only renders when a valid Agent Studio agent ID is configured in config.ts.
-  // Pass `isOnSearchPage` so the button is re-injected when the underlying
-  // autocomplete is remounted via its `key` on route transitions.
-  useAIButtonInjection(isOnSearchPage)
+  // The built-in `aiMode` prop on EXPERIMENTAL_Autocomplete renders an
+  // "AI Mode" button inside the search input. When clicked, the autocomplete
+  // automatically opens the Chat widget (via the shared <InstantSearch>
+  // render state) and forwards the current query as the first message.
+  // We gate it on a configured Agent Studio agent so the button only shows
+  // when the chat can actually answer.
+  const isAIModeEnabled = Boolean(
+    ecommerceConfig.features.agentStudio.shoppingAssistantAgentID,
+  )
 
   const {
     indices,
@@ -137,9 +141,10 @@ export const AutocompleteWidget = ({
       detachedMediaQuery="(max-width: 1024px)"
       onClick={handleClick}
       indices={indices}
-      showSuggestions={suggestionsConfig}
+      showQuerySuggestions={suggestionsConfig}
       showRecent={recentConfig}
       searchParameters={{ hitsPerPage }}
+      aiMode={isAIModeEnabled}
       onSelect={handleSelect}
       onSubmit={handleSubmit}
       panelComponent={({ elements }) => (

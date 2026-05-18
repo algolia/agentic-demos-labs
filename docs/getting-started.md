@@ -28,12 +28,13 @@ Open [http://localhost:3000](http://localhost:3000). You should see the storefro
 │   │   ├── config.ts                    # Algolia credentials + agent IDs
 │   │   └── layout.tsx                   # Root layout (header, search bar, AI panel)
 │   ├── components/
-│   │   └── autocomplete/                # Search bar + AI button injection
+│   │   └── autocomplete/                # Search bar (renders the built-in "AI Mode" button)
 │   │       ├── AutocompleteWidget.tsx
 │   │       └── hooks/
-│   │           └── useAIButtonInjection.ts
+│   │           ├── useAutocompleteIndices.tsx
+│   │           └── useDetachedBackButton.ts
 │   └── features/
-│       └── aiAssistant/
+│       └── chat/                        # Agent Studio chat sidebar
 │           ├── components/
 │           │   ├── AIAssistantLayout.tsx # Wraps page content, manages panel visibility
 │           │   ├── AIAssistantPanel.tsx  # The sliding chat panel
